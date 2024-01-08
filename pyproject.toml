@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pytop"
+version = "0.1.0"
+description = ""
+authors = ["noprobelm <noprobelm@protonmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+textual = "^0.47.1"
+rich = "^13.7.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+'pytop' = 'pytop.__main__:main'
