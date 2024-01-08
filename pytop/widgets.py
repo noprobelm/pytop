@@ -82,8 +82,10 @@ class ProcessTable(DataTable):
                 ]
             )
         }
+        updated = set()
         for pid in self.processes:
             row_key = str(pid)
+            updated.add(row_key)
             try:
                 self.get_row(str(row_key))
             except RowDoesNotExist:
@@ -103,6 +105,7 @@ class ProcessTable(DataTable):
                     cpu_times,
                     parser.parse_cmdline(self.processes[pid]["cmdline"])
                     or self.processes[pid]["name"],
+                    key=row_key,
                 )
             else:
                 virt, res, shr = parser.parse_pmem(self.processes[pid]["memory_info"])
@@ -121,3 +124,7 @@ class ProcessTable(DataTable):
                     "Command",
                     cmdline or self.processes[pid]["name"],
                 )
+        row_keys = set(k.value for k in self._row_locations)
+        dropped_pids = updated.difference(row_keys)
+        for p in dropped_pids:
+            self.remove_row(p)
