@@ -10,4 +10,3 @@ from textual.validation import URL
 from textual.app import App, ComposeResult
 from textual.widgets import DirectoryTree
 from textual.binding import Binding
-from textual.screen import Screen
