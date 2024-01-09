@@ -191,18 +191,3 @@ class Process:
         if unit_key == 0:
             return "0K"
         return f"{str(round(data, 2)).zfill(2)}{units[unit_key]}"
-
-
-def parse_pcputimes(pcputimes: pcputimes):
-    user, system = pcputimes.user, pcputimes.system
-    return sum((user, system))
-
-
-def parse_cmdline(cmdline: Optional[List[str]] = None) -> str:
-    if cmdline is None:
-        return ""
-    return " ".join(cmdline)
-
-
-def parse_status(status: str):
-    return STATUS[status]
