@@ -24,6 +24,7 @@ class ProcessTable(DataTable):
         ):
             self.add_column(label, key=label)
 
+        self.fixed_rows = 0
         self.update_processes()
         self.set_interval(1.5, self.update_processes)
         self.sort(self.current_sort[0], reverse=self.current_sort[1])
