@@ -99,8 +99,37 @@ class Memory:
 class Status:
     status: str
 
-    def __rich__(self):
+    def __rich__(self) -> Text:
         return Text(STATUS[self.status])
+
+
+@dataclass(order=True, eq=True)
+class Percent:
+    percent: float
+
+    def __rich__(self) -> Text:
+        percent = round(self.percent, 1)
+        if self.percent == 0:
+            return Text(str(percent), style="bold bright_black")
+        else:
+            return Text(str(percent))
+
+
+@dataclass(order=True, eq=True)
+class CPUTimes:
+    user: float
+    system: float
+
+    def __rich__(self) -> Text:
+        times = sum((self.user, self.system))
+        hours = int(times // 3600)
+        minutes = str(int(times % 3600 // 60))
+        seconds = str(int(times % 3600 % 60)).zfill(2)
+        milliseconds = str(int(times % 3600 % 60 % 1 * 100)).zfill(2)
+        if hours > 0:
+            return Text(f"{hours}hr{minutes}:{seconds}")
+        else:
+            return Text(f"{minutes}:{seconds}.{milliseconds}")
 
 
 class Process:
@@ -127,11 +156,11 @@ class Process:
         self.res = Memory(memory_info.rss)
         self.shr = Memory(memory_info.shared)
         self.status = STATUS[status]
-        self.cpu_percent = cpu_percent
-        self.memory_percent = memory_percent
+        self.cpu_percent = Percent(cpu_percent)
+        self.memory_percent = Percent(memory_percent)
 
         user, system = cpu_times.user, cpu_times.system
-        self.cpu_times = sum((user, system))
+        self.cpu_times = CPUTimes(user, system)
 
         if cmdline is None:
             self.cmdline = name
