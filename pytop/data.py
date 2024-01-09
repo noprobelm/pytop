@@ -95,6 +95,14 @@ class Memory:
         return Text(f"{str(round(data, 2)).zfill(2)}{units[unit_key]}")
 
 
+@dataclass(order=True, eq=True)
+class Status:
+    status: str
+
+    def __rich__(self):
+        return Text(STATUS[self.status])
+
+
 class Process:
     def __init__(
         self,
