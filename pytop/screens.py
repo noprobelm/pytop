@@ -3,6 +3,7 @@ from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Footer
 from .widgets import ProcessTable
+from textual.containers import Container, Horizontal, Vertical
 
 
 class Main(Screen):
@@ -20,5 +21,4 @@ class Main(Screen):
     ]
 
     def compose(self) -> ComposeResult:
-        yield ProcessTable()
-        yield Footer()
+        yield Container(ProcessTable(), Footer())
