@@ -1,21 +1,14 @@
 from textual.widgets import DataTable
 from textual.reactive import reactive
-
-from .processes import (
-    get_processes,
-    parse_pmem,
-    parse_pcputimes,
-    parse_cmdline,
-    parse_status,
-)
+from . import data
 
 
 class ProcessTable(DataTable):
-    processes = reactive(get_processes())
-
+    processes = reactive(data.get_processes())
     current_sort = ("CPU%", True)
 
     def on_mount(self):
+        self.cursor_type = "row"
         for label in (
             "PID",
             "USER",
@@ -32,23 +25,20 @@ class ProcessTable(DataTable):
         ):
             self.add_column(label, key=label)
         for pid in self.processes:
-            virt, res, shr = parse_pmem(self.processes[pid]["memory_info"])
-            cpu_times = parse_pcputimes(self.processes[pid]["cpu_times"])
-            cmdline = parse_cmdline(self.processes[pid]["cmdline"])
-            status = parse_status(self.processes[pid]["status"])
+            p = self.processes[pid]
             self.add_row(
                 int(pid),
-                self.processes[pid]["username"],
-                self.processes[pid]["nice"],
-                self.processes[pid]["nice"],
-                virt,
-                res,
-                shr,
-                status,
-                self.processes[pid]["cpu_percent"],
-                self.processes[pid]["memory_percent"],
-                cpu_times,
-                cmdline or self.processes[pid]["name"],
+                p.username,
+                p.nice,
+                p.nice,
+                p.virt,
+                p.res,
+                p.shr,
+                p.status,
+                p.cpu_percent,
+                p.memory_percent,
+                p.cpu_times,
+                p.cmdline,
                 key=pid,
             )
 
@@ -57,8 +47,7 @@ class ProcessTable(DataTable):
         self.sort(self.current_sort[0], reverse=self.current_sort[1])
 
     def update_processes(self):
-        self.processes = get_processes()
-
+        self.processes = data.get_processes()
         queued = set(self.processes.keys())
         rows = self.rows.copy()
         for row_key in rows:
@@ -68,47 +57,36 @@ class ProcessTable(DataTable):
             if pid not in self.processes.keys():
                 self.remove_row(pid)
                 continue
-            process_info = self.processes[pid]
-            virt, res, shr = parse_pmem(process_info["memory_info"])
-            cpu_times = parse_pcputimes(process_info["cpu_times"])
-            cmdline = parse_cmdline(process_info["cmdline"])
-            status = parse_status(self.processes[pid]["status"])
-
-            self.update_cell(pid, "PRI", process_info["nice"])
-            self.update_cell(pid, "NI", process_info["nice"])
-            self.update_cell(pid, "VIRT", virt)
-            self.update_cell(pid, "RES", res)
-            self.update_cell(pid, "SHR", shr)
-            self.update_cell(pid, "S", status)
-            self.update_cell(pid, "CPU%", process_info["cpu_percent"])
-            self.update_cell(pid, "MEM%", process_info["memory_percent"])
-            self.update_cell(
-                pid,
-                "Command",
-                cmdline or process_info["name"],
-            )
+            p = self.processes[pid]
+            self.update_cell(pid, "PRI", p.nice)
+            self.update_cell(pid, "NI", p.nice)
+            self.update_cell(pid, "VIRT", p.virt)
+            self.update_cell(pid, "RES", p.res)
+            self.update_cell(pid, "SHR", p.shr)
+            self.update_cell(pid, "S", p.status)
+            self.update_cell(pid, "CPU%", p.cpu_percent)
+            self.update_cell(pid, "MEM%", p.memory_percent)
+            self.update_cell(pid, "Command", p.cmdline)
             queued.remove(pid)
 
         for pid in queued:
-            virt, res, shr = parse_pmem(self.processes[pid]["memory_info"])
-            cpu_times = parse_pcputimes(self.processes[pid]["cpu_times"])
-            cmdline = parse_cmdline(self.processes[pid]["cmdline"])
-            status = parse_status(self.processes[pid]["status"])
+            p = self.processes[pid]
             self.add_row(
                 int(pid),
-                self.processes[pid]["username"],
-                self.processes[pid]["nice"],
-                self.processes[pid]["nice"],
-                virt,
-                res,
-                shr,
-                status,
-                self.processes[pid]["cpu_percent"],
-                self.processes[pid]["memory_percent"],
-                cpu_times,
-                cmdline or self.processes[pid]["name"],
+                p.username,
+                p.nice,
+                p.nice,
+                p.virt,
+                p.res,
+                p.shr,
+                p.status,
+                p.cpu_percent,
+                p.memory_percent,
+                p.cpu_times,
+                p.cmdline,
                 key=pid,
             )
+        self.sort(self.current_sort[0], reverse=self.current_sort[1])
 
     def on_data_table_header_selected(self, selected: DataTable.HeaderSelected):
         if self.current_sort[0] == selected.column_key:
