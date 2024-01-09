@@ -113,7 +113,11 @@ class Status:
     status: str
 
     def __rich__(self) -> Text:
-        return Text(STATUS[self.status])
+        status = STATUS[self.status]
+        if status == "R":
+            return Text(status, style="bright_green")
+        else:
+            return Text(status)
 
 
 @dataclass(order=True, eq=True)
