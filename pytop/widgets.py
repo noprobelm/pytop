@@ -1,5 +1,4 @@
 from textual.widgets import DataTable
-from textual.reactive import reactive
 from . import data
 
 
