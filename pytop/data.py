@@ -77,6 +77,24 @@ class Priority:
         return Text(str(self.priority), justify="right")
 
 
+@dataclass(order=True, eq=True)
+class Memory:
+    size: int
+
+    def __rich__(self) -> Text:
+        units = {0: "B", 1: "K", 2: "M", 3: "G", 4: "T"}
+        unit_key = 0
+        exp = 2**10
+        data = self.size
+        while data > exp:
+            data = data // exp
+            unit_key += 1
+
+        if unit_key == 0:
+            return Text("0K")
+        return Text(f"{str(round(data, 2)).zfill(2)}{units[unit_key]}")
+
+
 class Process:
     def __init__(
         self,
@@ -97,9 +115,9 @@ class Process:
         self.nice = Nice(nice)
         self.pri = Priority(nice)
 
-        self.virt = self._format_bytes(memory_info.vms)
-        self.res = self._format_bytes(memory_info.rss)
-        self.shr = self._format_bytes(memory_info.shared)
+        self.virt = Memory(memory_info.vms)
+        self.res = Memory(memory_info.rss)
+        self.shr = Memory(memory_info.shared)
         self.status = STATUS[status]
         self.cpu_percent = cpu_percent
         self.memory_percent = memory_percent
