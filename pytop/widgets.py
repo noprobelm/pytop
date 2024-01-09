@@ -4,7 +4,7 @@ from . import data
 
 
 class ProcessTable(DataTable):
-    processes = reactive(data.get_processes())
+    processes = data.get_processes()
     current_sort = ("CPU%", True)
 
     def on_mount(self):
@@ -27,7 +27,7 @@ class ProcessTable(DataTable):
         for pid in self.processes:
             p = self.processes[pid]
             self.add_row(
-                int(pid),
+                p.pid,
                 p.username,
                 p.nice,
                 p.nice,
@@ -72,7 +72,7 @@ class ProcessTable(DataTable):
         for pid in queued:
             p = self.processes[pid]
             self.add_row(
-                int(pid),
+                p.pid,
                 p.username,
                 p.nice,
                 p.nice,
