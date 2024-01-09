@@ -183,15 +183,3 @@ class Process:
             self.cmdline = name
         else:
             self.cmdline = "".join(cmdline)
-
-    def _format_bytes(self, data: int):
-        units = {0: "B", 1: "K", 2: "M", 3: "G", 4: "T"}
-        unit_key = 0
-        exp = 2**10
-        while data > exp:
-            data = data // exp
-            unit_key += 1
-
-        if unit_key == 0:
-            return "0K"
-        return f"{str(round(data, 2)).zfill(2)}{units[unit_key]}"
