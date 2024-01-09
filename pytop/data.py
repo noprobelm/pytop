@@ -3,6 +3,9 @@ import psutil
 from psutil._pslinux import pmem
 from psutil._common import pcputimes
 from typing import List, Optional
+from rich.text import Text
+from dataclasses import dataclass
+import os
 
 STATUS = {
     psutil.STATUS_RUNNING: "R",
@@ -16,6 +19,8 @@ STATUS = {
     psutil.STATUS_PARKED: "P",
     psutil.STATUS_IDLE: "I",
 }
+
+USERNAME = os.getlogin()
 
 
 def get_processes() -> dict[str, Process]:
@@ -37,6 +42,25 @@ def get_processes() -> dict[str, Process]:
     return processes
 
 
+@dataclass(order=True, eq=True)
+class PID:
+    pid: int
+
+    def __rich__(self) -> Text:
+        return Text(str(self.pid), justify="right")
+
+
+@dataclass(order=True, eq=True)
+class Username:
+    username: str
+
+    def __rich__(self) -> Text:
+        if self.username != USERNAME:
+            return Text(self.username, style="bold bright_black")
+        else:
+            return Text(self.username)
+
+
 class Process:
     def __init__(
         self,
@@ -51,9 +75,9 @@ class Process:
         cpu_times: pcputimes,
         cmdline: Optional[List[str]] = None,
     ):
-        self.pid = pid
+        self.pid = PID(pid)
         self.name = name
-        self.username = username
+        self.username = Username(username)
         self.nice = nice
         self.pri = nice
 
