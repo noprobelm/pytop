@@ -42,9 +42,6 @@ def get_processes() -> dict[str, Process]:
     return processes
 
 
-EXP = 2**10
-
-
 @dataclass(order=True, eq=True)
 class PID:
     pid: int
@@ -95,8 +92,8 @@ class Memory:
         }
         unit_key = 0
         data = self.size
-        while data > EXP:
-            data = data // EXP
+        while data > 1024:
+            data = data // 1024
             unit_key += 1
 
         if unit_key == 0:
