@@ -4,7 +4,7 @@ from . import data
 
 
 class ProcessTable(DataTable):
-    processes = data.get_processes()
+    processes: dict[str, data.Process] = {}
     current_sort = ("CPU%", True)
 
     def on_mount(self):
@@ -24,26 +24,9 @@ class ProcessTable(DataTable):
             "Command",
         ):
             self.add_column(label, key=label)
-        for pid in self.processes:
-            p = self.processes[pid]
-            self.add_row(
-                p.pid,
-                p.username,
-                p.nice,
-                p.nice,
-                p.virt,
-                p.res,
-                p.shr,
-                p.status,
-                p.cpu_percent,
-                p.memory_percent,
-                p.cpu_times,
-                p.cmdline,
-                key=pid,
-            )
 
+        self.update_processes()
         self.set_interval(1.5, self.update_processes)
-
         self.sort(self.current_sort[0], reverse=self.current_sort[1])
 
     def update_processes(self):
