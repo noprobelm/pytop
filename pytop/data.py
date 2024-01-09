@@ -42,6 +42,9 @@ def get_processes() -> dict[str, Process]:
     return processes
 
 
+EXP = 2**10
+
+
 @dataclass(order=True, eq=True)
 class PID:
     pid: int
@@ -82,17 +85,30 @@ class Memory:
     size: int
 
     def __rich__(self) -> Text:
-        units = {0: "B", 1: "K", 2: "M", 3: "G", 4: "T"}
+        units = {0: "K", 1: "K", 2: "M", 3: "G", 4: "T"}
+        unit_styles = {
+            0: "",
+            1: "",
+            2: "bright_cyan",
+            3: "bright_green",
+            4: "bright_red",
+        }
         unit_key = 0
-        exp = 2**10
         data = self.size
-        while data > exp:
-            data = data // exp
+        while data > EXP:
+            data = data // EXP
             unit_key += 1
 
         if unit_key == 0:
             return Text("0K")
-        return Text(f"{str(round(data, 2)).zfill(2)}{units[unit_key]}")
+        elif unit_key == 4:
+            return Text(
+                f">{str(round(data, 2))}{units[unit_key]}", style=unit_styles[unit_key]
+            )
+        else:
+            return Text(
+                f"{str(round(data, 2))}{units[unit_key]}", style=unit_styles[unit_key]
+            )
 
 
 @dataclass(order=True, eq=True)
