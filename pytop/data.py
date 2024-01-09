@@ -172,7 +172,7 @@ class Process:
         self.virt = Memory(memory_info.vms)
         self.res = Memory(memory_info.rss)
         self.shr = Memory(memory_info.shared)
-        self.status = STATUS[status]
+        self.status = Status(status)
         self.cpu_percent = Percent(cpu_percent)
         self.memory_percent = Percent(memory_percent)
 
