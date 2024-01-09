@@ -2,7 +2,7 @@ from textual.app import App
 from . import screens
 
 
-class App(App):
+class Pytop(App):
     SCREENS = {"main": screens.Main()}
 
     def on_mount(self) -> None:

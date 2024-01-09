@@ -1,6 +1,6 @@
-from .app import app
+from .app import Pytop
 
 
 def main():
-    a = app.App()
-    a.run()
+    pytop = Pytop()
+    pytop.run()
