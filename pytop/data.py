@@ -61,6 +61,22 @@ class Username:
             return Text(self.username)
 
 
+@dataclass(order=True, eq=True)
+class Nice:
+    nice: int
+
+    def __rich__(self) -> Text:
+        return Text(str(self.nice), justify="right")
+
+
+@dataclass(order=True, eq=True)
+class Priority:
+    priority: int
+
+    def __rich__(self) -> Text:
+        return Text(str(self.priority), justify="right")
+
+
 class Process:
     def __init__(
         self,
@@ -78,8 +94,8 @@ class Process:
         self.pid = PID(pid)
         self.name = name
         self.username = Username(username)
-        self.nice = nice
-        self.pri = nice
+        self.nice = Nice(nice)
+        self.pri = Priority(nice)
 
         self.virt = self._format_bytes(memory_info.vms)
         self.res = self._format_bytes(memory_info.rss)
