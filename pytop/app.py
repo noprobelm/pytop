@@ -4,6 +4,7 @@ from . import screens
 
 class Pytop(App):
     SCREENS = {"main": screens.Main()}
+    CSS_PATH = "styles/styles.tcss"
 
     def on_mount(self) -> None:
         self.push_screen("main")

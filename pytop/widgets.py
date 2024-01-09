@@ -1,5 +1,21 @@
-from textual.widgets import DataTable
+from textual.app import ComposeResult
+from textual.widgets import DataTable, ProgressBar, Placeholder, Static
+from textual.containers import Container, Horizontal, Vertical
 from . import data
+
+
+class CPUBar(ProgressBar):
+    def __init__(self, percent: float, *args, **kwargs):
+        self.percent = percent
+        super().__init__(*args, **kwargs)
+
+    def on_mount(self) -> None:
+        """Set up a timer to simulate progess happening."""
+        self.progress_timer = self.set_interval(1.5, self.update_usage)
+
+    def update_usage(self):
+        self.update(total=100.0)
+        self.progress = self.percent
 
 
 class ProcessTable(DataTable):

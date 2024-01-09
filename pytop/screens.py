@@ -1,8 +1,8 @@
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.binding import Binding
-from textual.widgets import Footer
-from .widgets import ProcessTable
+from textual.widgets import Footer, Placeholder
+from .widgets import ProcessTable, CPUBar
 from textual.containers import Container, Horizontal, Vertical
 
 
@@ -20,5 +20,34 @@ class Main(Screen):
         Binding(key="F10", action="quit", description="Quit"),
     ]
 
+    STYLES = "styles/styles.tcss"
+
     def compose(self) -> ComposeResult:
-        yield Container(ProcessTable(), Footer())
+        yield Vertical(
+            Container(
+                Container(
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    classes="meters-column",
+                ),
+                Container(
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    Placeholder(),
+                    classes="meters-column",
+                ),
+                id="meters",
+            ),
+            Container(ProcessTable(), Footer(), id="bot"),
+        )

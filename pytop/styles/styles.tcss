@@ -1,0 +1,41 @@
+#meters {
+    height: 30%;
+    width: 100%;
+    layout: grid;
+    grid-size: 2;
+    padding-bottom: 1;
+    /* border: solid red; */
+}
+
+.meters-column {
+    height: auto;
+    width: 100%;
+    layout: grid;
+    grid-gutter: 1;
+    padding: 0 1 0 1;
+    
+}
+
+#bot {
+    layout: vertical;
+    width: 100%;
+}
+
+
+ProcessTable {
+    height: auto;
+}
+
+Footer {
+    height: auto;
+}
+
+.meter {
+    height: auto;
+    width: auto;
+    /* border: solid green; */
+}
+
+Placeholder {
+    height: 1;
+}

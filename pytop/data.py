@@ -183,3 +183,53 @@ class Process:
             self.cmdline = name
         else:
             self.cmdline = "".join(cmdline)
+
+
+@dataclass
+class CPUCore:
+    percent: float
+
+
+class CPU(dict):
+    def __init__(self):
+        self.cpu_count: int = psutil.cpu_count(logical=True)
+        self._cores = [CPUCore(percent) for percent in psutil.cpu_percent(percpu=True)]
+
+    @property
+    def cores(self):
+        for i, p in psutil.cpu_percent(percpu=True):
+            self._cores[i].percent = p
+
+    #     self.query()
+    #     self.index = 0
+
+    # def query(self):
+    #     self.used = psutil.cpu_percent()
+    #     self.cores = []
+    #     cpu_times_percent = psutil.cpu_times_percent(percpu=True)
+    #     for cpu_core in cpu_times_percent:
+    #         self.cores.append(
+    #             {
+    #                 "used": cpu_core.user,
+    #                 "nice": cpu_core.nice,
+    #                 "guest_nice": cpu_core.guest_nice,
+    #                 "user": cpu_core.user,
+    #                 "system": cpu_core.system,
+    #                 "iowait": cpu_core.iowait,
+    #                 "irq": cpu_core.irq,
+    #                 "softirq": cpu_core.softirq,
+    #                 "steal": cpu_core.steal,
+    #                 "guest": cpu_core.guest,
+    #             }
+    #         )
+
+    # def __iter__(self):
+    #     return self
+
+    # def __next__(self):
+    #     try:
+    #         result = self.cores[self.index]
+    #     except IndexError:
+    #         raise StopIteration
+    #     self.index += 1
+    #     return result
