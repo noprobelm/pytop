@@ -1,6 +1,8 @@
 from textual.app import ComposeResult
+from textual.widget import Widget
 from textual.widgets import DataTable, ProgressBar, Placeholder, Static
 from textual.containers import Container, Horizontal, Vertical
+from textual.reactive import reactive
 from . import data
 
 
@@ -93,3 +95,28 @@ class ProcessTable(DataTable):
         else:
             self.current_sort = (selected.column_key, True)
         self.sort(self.current_sort[0], reverse=self.current_sort[1])
+
+
+class Meter(Widget):
+    readout = reactive("")
+    DEFAULT_CSS = """
+    Meter {
+        align-horizontal: left;
+        overflow: hidden;
+        color: $text;
+    }
+    """
+
+    def __init__(
+        self,
+        label: str,
+        *,
+        name: str | None = None,
+        id: str | None = None,
+        classes: str | None = None,
+    ):
+        self.label = label
+        super().__init__(name=name, id=id, classes=classes)
+
+    def render(self):
+        return f"{self.label}[{' ' * (self.size.width - len(self.label) - len(str(self.readout)) - 3)}{self.readout}%]"

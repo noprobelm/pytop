@@ -2,7 +2,7 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Footer, Placeholder
-from .widgets import ProcessTable, CPUBar
+from .widgets import ProcessTable, CPUBar, Meter
 from textual.containers import Container, Horizontal, Vertical, Grid
 
 
@@ -27,7 +27,7 @@ class Main(Screen):
             Horizontal(
                 Vertical(
                     Horizontal(
-                        Placeholder("1", classes="meter"),
+                        Meter("0", classes="meter"),
                         Placeholder("2", classes="meter"),
                         classes="meter-row",
                     ),
