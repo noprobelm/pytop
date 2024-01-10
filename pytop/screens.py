@@ -23,31 +23,60 @@ class Main(Screen):
     STYLES = "styles/styles.tcss"
 
     def compose(self) -> ComposeResult:
-        yield Container(
-            Container(
-                Grid(
-                    Placeholder("1", classes="meter"),
-                    Placeholder("2", classes="meter"),
-                    Placeholder("3", classes="meter"),
-                    Placeholder("4", classes="meter"),
-                    Placeholder("5", classes="meter"),
-                    Placeholder("6", classes="meter"),
-                    Placeholder("7", classes="meter"),
-                    Placeholder("8", classes="meter"),
-                    classes="meters-column",
+        yield Vertical(
+            Horizontal(
+                Vertical(
+                    Horizontal(
+                        Placeholder("1", classes="meter"),
+                        Placeholder("2", classes="meter"),
+                        classes="meter-row",
+                    ),
+                    Horizontal(
+                        Placeholder("3", classes="meter"),
+                        Placeholder("4", classes="meter"),
+                        classes="meter-row",
+                    ),
+                    Horizontal(
+                        Placeholder("5", classes="meter"),
+                        Placeholder("6", classes="meter"),
+                        classes="meter-row",
+                    ),
+                    Horizontal(
+                        Placeholder("7", classes="meter"),
+                        Placeholder("8", classes="meter"),
+                        classes="meter-row",
+                    ),
+                    Placeholder("Mem", classes="meter"),
+                    Placeholder("Swap", classes="meter"),
+                    id="col1",
                 ),
-                Grid(
-                    Placeholder("9", classes="meter"),
-                    Placeholder("10", classes="meter"),
-                    Placeholder("11", classes="meter"),
-                    Placeholder("12", classes="meter"),
-                    Placeholder("13", classes="meter"),
-                    Placeholder("14", classes="meter"),
-                    Placeholder("15", classes="meter"),
-                    Placeholder("16", classes="meter"),
-                    classes="meters-column",
+                Vertical(
+                    Horizontal(
+                        Placeholder("9", classes="meter"),
+                        Placeholder("10", classes="meter"),
+                        classes="meter-row",
+                    ),
+                    Horizontal(
+                        Placeholder("11", classes="meter"),
+                        Placeholder("12", classes="meter"),
+                        classes="meter-row",
+                    ),
+                    Horizontal(
+                        Placeholder("13", classes="meter"),
+                        Placeholder("14", classes="meter"),
+                        classes="meter-row",
+                    ),
+                    Horizontal(
+                        Placeholder("15", classes="meter"),
+                        Placeholder("16", classes="meter"),
+                        classes="meter-row",
+                    ),
+                    Placeholder("Tasks", classes="meter"),
+                    Placeholder("Load Average", classes="meter"),
+                    Placeholder("Uptime", classes="meter"),
+                    id="col2",
                 ),
-                id="meters",
+                id="top",
             ),
-            Container(ProcessTable(), Footer(), id="bot"),
+            Vertical(ProcessTable(), Footer(), id="bot"),
         )
