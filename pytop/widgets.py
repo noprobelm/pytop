@@ -2,7 +2,8 @@ from textual.app import ComposeResult
 from textual.widget import Widget
 from textual.widgets import DataTable, ProgressBar, Placeholder, Static
 from textual.containers import Container, Horizontal, Vertical
-from textual.reactive import reactive
+from textual.reactive import reactive, Reactive
+from typing_extensions import Literal
 from . import data
 
 
@@ -97,8 +98,28 @@ class ProcessTable(DataTable):
         self.sort(self.current_sort[0], reverse=self.current_sort[1])
 
 
-class Meter(Widget):
-    readout = reactive("")
+ReadoutType = Literal["percent", "size"]
+
+
+class Progress(Static):
+    progress = reactive(0.0)
+    total = reactive(0.0)
+
+    DEFAULT_CSS = """
+    Progress {
+        align-horizontal: left;
+        overflow: hidden;
+    }
+    """
+
+    def watch_progress(self):
+        num_bars = int(self.size.width * self.progress // self.total)
+        self.update(f"{'|' * num_bars}{' ' * (self.size.width - num_bars)}")
+
+
+class TextProgressBar(Static):
+    readout_type: Reactive[ReadoutType] = Reactive[ReadoutType]("percent")
+    progress: Reactive[float] = Reactive[float](0.0)
     DEFAULT_CSS = """
     Meter {
         align-horizontal: left;
@@ -110,13 +131,42 @@ class Meter(Widget):
     def __init__(
         self,
         label: str,
+        total: float,
+        show_progress: bool = False,
         *,
         name: str | None = None,
         id: str | None = None,
         classes: str | None = None,
     ):
         self.label = label
+        self.total = total
+        self.show_progress = False
         super().__init__(name=name, id=id, classes=classes)
 
+    def watch_progress(self):
+        num_bars = int(self.size.width * self.progress // self.total)
+        self.update(f"[{'|' * num_bars}{' ' * (self.size.width - num_bars)}]")
+
     def render(self):
-        return f"{self.label}[{' ' * (self.size.width - len(self.label) - len(str(self.readout)) - 3)}{self.readout}%]"
+        bar_width = self.size.width - len(self.label) - len(str(self.progress)) - 2
+        num_bars = int(bar_width * self.progress // self.total)
+        bars = "|" * num_bars
+        empty = " " * (bar_width - len(bars))
+        return f"{self.label}[{bars}{empty}{self.progress}]"
+
+
+class PercentBar(TextProgressBar):
+    def __init__(
+        self,
+        cpu_core: int,
+        *,
+        name: str | None = None,
+        id: str | None = None,
+        classes: str | None = None,
+    ):
+        label = str(cpu_core)
+        total = 100.0
+        super().__init__(label, total, False, name=name, id=id, classes=classes)
+
+    def on_mount(self):
+        self.progress = 25.0
