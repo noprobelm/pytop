@@ -3,18 +3,24 @@
     width: 100%;
     layout: grid;
     grid-size: 2;
-    padding-bottom: 1;
-    /* border: solid red; */
 }
 
 .meters-column {
-    height: auto;
+    height: 100%;
+    align-vertical: middle;
     width: 100%;
     layout: grid;
-    grid-gutter: 1;
+    grid-size: 2 4;
+    grid-gutter: 0 2;
     padding: 0 1 0 1;
-    
 }
+
+.meter {
+    height: 1;
+    width: 100%;
+/*    border: solid green;*/
+}
+
 
 #bot {
     layout: vertical;
@@ -30,14 +36,4 @@ ProcessTable {
 
 Footer {
     height: auto;
-}
-
-.meter {
-    height: auto;
-    width: auto;
-    /* border: solid green; */
-}
-
-Placeholder {
-    height: 1;
 }

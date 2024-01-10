@@ -3,7 +3,7 @@ from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Footer, Placeholder
 from .widgets import ProcessTable, CPUBar
-from textual.containers import Container, Horizontal, Vertical
+from textual.containers import Container, Horizontal, Vertical, Grid
 
 
 class Main(Screen):
@@ -23,28 +23,28 @@ class Main(Screen):
     STYLES = "styles/styles.tcss"
 
     def compose(self) -> ComposeResult:
-        yield Vertical(
+        yield Container(
             Container(
-                Container(
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
+                Grid(
+                    Placeholder("1", classes="meter"),
+                    Placeholder("2", classes="meter"),
+                    Placeholder("3", classes="meter"),
+                    Placeholder("4", classes="meter"),
+                    Placeholder("5", classes="meter"),
+                    Placeholder("6", classes="meter"),
+                    Placeholder("7", classes="meter"),
+                    Placeholder("8", classes="meter"),
                     classes="meters-column",
                 ),
-                Container(
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
-                    Placeholder(),
+                Grid(
+                    Placeholder("9", classes="meter"),
+                    Placeholder("10", classes="meter"),
+                    Placeholder("11", classes="meter"),
+                    Placeholder("12", classes="meter"),
+                    Placeholder("13", classes="meter"),
+                    Placeholder("14", classes="meter"),
+                    Placeholder("15", classes="meter"),
+                    Placeholder("16", classes="meter"),
                     classes="meters-column",
                 ),
                 id="meters",
