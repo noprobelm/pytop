@@ -1,8 +1,11 @@
 from textual.app import App
+from . import data
+from .widgets import ProcessTable
 from . import screens
 
 
 class Pytop(App):
+    processes = data.get_processes()
     SCREENS = {"main": screens.Main()}
     CSS_PATH = "styles/styles.tcss"
 

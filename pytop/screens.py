@@ -1,12 +1,15 @@
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.binding import Binding
-from textual.widgets import Footer, Placeholder
-from .widgets import ProcessTable, PercentBar, TextProgressBar
+from textual.widgets import Footer, Placeholder, ProgressBar
+from .widgets import ProcessTable, TextProgressBar
 from textual.containers import Container, Horizontal, Vertical, Grid
+from . import data
 
 
 class Main(Screen):
+    processes = data.get_processes()
+
     BINDINGS = [
         Binding(key="F1", action="help", description="Help"),
         Binding(key="F2", action="setup", description="Setup"),
@@ -22,12 +25,20 @@ class Main(Screen):
 
     STYLES = "styles/styles.tcss"
 
+    def on_mount(self) -> None:
+        self.set_interval(1.5, self.update_data)
+        self.update_data()
+
+    def update_data(self) -> None:
+        top = self.query_one(ProcessTable)
+        top.processes = data.get_processes()
+
     def compose(self) -> ComposeResult:
         yield Vertical(
             Horizontal(
                 Vertical(
                     Horizontal(
-                        PercentBar(0, classes="meter"),
+                        TextProgressBar(25.0, 100.0, classes="meter"),
                         Placeholder("2", classes="meter"),
                         classes="meter-row",
                     ),

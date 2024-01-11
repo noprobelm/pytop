@@ -1,28 +1,14 @@
 from textual.app import ComposeResult
 from textual.widget import Widget
-from textual.widgets import DataTable, ProgressBar, Placeholder, Static
+from textual.widgets import DataTable, Placeholder, Static, TextArea
 from textual.containers import Container, Horizontal, Vertical
 from textual.reactive import reactive, Reactive
 from typing_extensions import Literal
-from . import data
-
-
-class CPUBar(ProgressBar):
-    def __init__(self, percent: float, *args, **kwargs):
-        self.percent = percent
-        super().__init__(*args, **kwargs)
-
-    def on_mount(self) -> None:
-        """Set up a timer to simulate progess happening."""
-        self.progress_timer = self.set_interval(1.5, self.update_usage)
-
-    def update_usage(self):
-        self.update(total=100.0)
-        self.progress = self.percent
+from .data import Process
 
 
 class ProcessTable(DataTable):
-    processes: dict[str, data.Process] = {}
+    processes = reactive({})
     current_sort = ("CPU%", True)
 
     def on_mount(self):
@@ -44,12 +30,9 @@ class ProcessTable(DataTable):
             self.add_column(label, key=label)
 
         self.fixed_rows = 0
-        self.update_processes()
-        self.set_interval(1.5, self.update_processes)
         self.sort(self.current_sort[0], reverse=self.current_sort[1])
 
-    def update_processes(self):
-        self.processes = data.get_processes()
+    def watch_processes(self):
         queued = set(self.processes.keys())
         rows = self.rows.copy()
         for row_key in rows:
@@ -101,72 +84,63 @@ class ProcessTable(DataTable):
 ReadoutType = Literal["percent", "size"]
 
 
-class Progress(Static):
-    progress = reactive(0.0)
-    total = reactive(0.0)
+class ProgressBar(Static):
+    progress = reactive(25.0)
+    total = reactive(100.0)
 
     DEFAULT_CSS = """
-    Progress {
-        align-horizontal: left;
-        overflow: hidden;
+    ProgressBar {
+        width: 1fr;
     }
     """
 
-    def watch_progress(self):
-        num_bars = int(self.size.width * self.progress // self.total)
-        self.update(f"{'|' * num_bars}{' ' * (self.size.width - num_bars)}")
-
-
-class TextProgressBar(Static):
-    readout_type: Reactive[ReadoutType] = Reactive[ReadoutType]("percent")
-    progress: Reactive[float] = Reactive[float](0.0)
-    DEFAULT_CSS = """
-    Meter {
-        align-horizontal: left;
-        overflow: hidden;
-        color: $text;
-    }
-    """
-
-    def __init__(
-        self,
-        label: str,
-        total: float,
-        show_progress: bool = False,
-        *,
-        name: str | None = None,
-        id: str | None = None,
-        classes: str | None = None,
-    ):
-        self.label = label
+    def __init__(self, progress: float, total: float):
+        self.progress = progress
         self.total = total
-        self.show_progress = False
-        super().__init__(name=name, id=id, classes=classes)
-
-    def watch_progress(self):
-        num_bars = int(self.size.width * self.progress // self.total)
-        self.update(f"[{'|' * num_bars}{' ' * (self.size.width - num_bars)}]")
+        super().__init__()
 
     def render(self):
-        bar_width = self.size.width - len(self.label) - len(str(self.progress)) - 2
-        num_bars = int(bar_width * self.progress // self.total)
-        bars = "|" * num_bars
-        empty = " " * (bar_width - len(bars))
-        return f"{self.label}[{bars}{empty}{self.progress}]"
+        num_bars = int((self.size.width * self.progress // self.total))
+        whitespace = self.size.width - num_bars - 2
+        return f"[{'[bold green]|' * num_bars}{' ' * whitespace}]"
 
 
-class PercentBar(TextProgressBar):
+class TextProgressBar(Widget):
+    progress = reactive(25.0)
+    total = reactive(100.0)
+
+    DEFAULT_CSS = """
+    TextProgressBar {
+        width: 1fr;
+    }
+    """
+
     def __init__(
         self,
-        cpu_core: int,
+        progress: float,
+        total: float,
         *,
         name: str | None = None,
         id: str | None = None,
         classes: str | None = None,
     ):
-        label = str(cpu_core)
-        total = 100.0
-        super().__init__(label, total, False, name=name, id=id, classes=classes)
+        super().__init__(name=name, id=id, classes=classes)
+        self.progress = progress
+        self.total = total
 
-    def on_mount(self):
-        self.progress = 25.0
+    def validate_progress(self, progress: float):
+        if progress == 0:
+            return 0.1
+        return progress
+
+    def render(self):
+        num_bars = int((self.size.width * self.progress // self.total))
+        whitespace = self.size.width - num_bars - 3 - len(str(self.progress))
+        return f"[{'[bold green]|' * num_bars}{' ' * whitespace}{self.progress}%]"
+
+    # def render(self):
+    #     bar_width = self.size.width - len(self.label) - len(str(self.progress)) - 2
+    #     num_bars = int(bar_width * self.progress // self.total)
+    #     bars = "|" * num_bars
+    #     empty = " " * (bar_width - len(bars))
+    #     return f"{self.label}[{bars}{empty}{self.progress}]"
