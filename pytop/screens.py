@@ -2,13 +2,16 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Footer, Placeholder, ProgressBar
-from .widgets import ProcessTable, TextProgressBar
+from .widgets import ProcessTable
+from .meter import TextMeter
 from textual.containers import Container, Horizontal, Vertical, Grid
 from . import data
 
 
 class Main(Screen):
     processes = data.get_processes()
+    cpu = data.CPU()
+    virtual_memory = data.VirtualMemory()
 
     BINDINGS = [
         Binding(key="F1", action="help", description="Help"),
@@ -33,53 +36,63 @@ class Main(Screen):
         top = self.query_one(ProcessTable)
         top.processes = data.get_processes()
 
+        self.cpu.update()
+        cpu_meters = self.query(".cpu").results(TextMeter)
+        for i, meter in enumerate(cpu_meters):
+            meter.progress = self.cpu.cores[i]
+
+        self.virtual_memory.update()
+        virtual_memory_meter = self.query_one(".memory")
+        virtual_memory_meter.progress = self.virtual_memory.used
+        virtual_memory_meter.total = self.virtual_memory.free + self.virtual_memory.used
+
     def compose(self) -> ComposeResult:
         yield Vertical(
             Horizontal(
                 Vertical(
                     Horizontal(
-                        TextProgressBar(25.0, 100.0, classes="meter"),
-                        Placeholder("2", classes="meter"),
+                        TextMeter("0", 25.0, 100.0, "percent", classes="cpu"),
+                        TextMeter("1", 25.0, 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        Placeholder("3", classes="meter"),
-                        Placeholder("4", classes="meter"),
+                        TextMeter("2", 25.0, 100.0, "percent", classes="cpu"),
+                        TextMeter("3", 25.0, 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        Placeholder("5", classes="meter"),
-                        Placeholder("6", classes="meter"),
+                        TextMeter("4", 25.0, 100.0, "percent", classes="cpu"),
+                        TextMeter("5", 25.0, 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        Placeholder("7", classes="meter"),
-                        Placeholder("8", classes="meter"),
+                        TextMeter("6", 25.0, 100.0, "percent", classes="cpu"),
+                        TextMeter("7", 25.0, 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
-                    Placeholder("Mem", classes="meter"),
+                    TextMeter("Mem", 25.0, 100.0, "proportion", classes="memory"),
                     Placeholder("Swap", classes="meter"),
                     id="col1",
                 ),
                 Vertical(
                     Horizontal(
-                        Placeholder("9", classes="meter"),
-                        Placeholder("10", classes="meter"),
+                        TextMeter("8", 25.0, 100.0, "percent", classes="cpu"),
+                        TextMeter("9", 25.0, 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        Placeholder("11", classes="meter"),
-                        Placeholder("12", classes="meter"),
+                        TextMeter("10", 25.0, 100.0, "percent", classes="cpu"),
+                        TextMeter("11", 25.0, 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        Placeholder("13", classes="meter"),
-                        Placeholder("14", classes="meter"),
+                        TextMeter("12", 25.0, 100.0, "percent", classes="cpu"),
+                        TextMeter("13", 25.0, 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        Placeholder("15", classes="meter"),
-                        Placeholder("16", classes="meter"),
+                        TextMeter("14", 25.0, 100.0, "percent", classes="cpu"),
+                        TextMeter("15", 25.0, 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Placeholder("Tasks", classes="meter"),

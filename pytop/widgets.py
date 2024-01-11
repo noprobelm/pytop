@@ -105,7 +105,7 @@ class ProgressBar(Static):
         return f"[{'[bold green]|' * num_bars}{' ' * whitespace}]"
 
 
-class TextProgressBar(Widget):
+class CPUMeter(Widget):
     progress = reactive(25.0)
     total = reactive(100.0)
 
@@ -117,6 +117,7 @@ class TextProgressBar(Widget):
 
     def __init__(
         self,
+        label: str,
         progress: float,
         total: float,
         *,
@@ -125,6 +126,7 @@ class TextProgressBar(Widget):
         classes: str | None = None,
     ):
         super().__init__(name=name, id=id, classes=classes)
+        self.label = label
         self.progress = progress
         self.total = total
 
@@ -134,9 +136,13 @@ class TextProgressBar(Widget):
         return progress
 
     def render(self):
-        num_bars = int((self.size.width * self.progress // self.total))
-        whitespace = self.size.width - num_bars - 3 - len(str(self.progress))
-        return f"[{'[bold green]|' * num_bars}{' ' * whitespace}{self.progress}%]"
+        progress_region_width = (
+            self.size.width - 4 - len(self.label) - len(str(self.progress))
+        )
+
+        num_bars = int(progress_region_width * self.progress // self.total)
+        num_whitespace = progress_region_width - num_bars
+        return f"{self.label}[{'[bold green]|' * num_bars}{' ' * num_whitespace}{self.progress}%]"
 
     # def render(self):
     #     bar_width = self.size.width - len(self.label) - len(str(self.progress)) - 2
