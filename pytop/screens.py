@@ -3,19 +3,13 @@ from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Footer, Placeholder
 from .widgets.process_table import ProcessTable
-from .widgets.meters import (
-    LoadAverage,
-    Uptime,
-    CPUUsage,
-    RAMUsage,
-    SwapUsage,
-)
+from .widgets.meters import LoadAverage, Uptime, CPUUsage, RAMUsage, SwapUsage, Tasks
 from textual.containers import Horizontal, Vertical
 from . import data
 
 
 class Main(Screen):
-    processes = data.get_processes()
+    processes = data.Processes()
     cpu = data.CPU()
 
     BINDINGS = [
@@ -39,12 +33,19 @@ class Main(Screen):
 
     def update_data(self) -> None:
         top = self.query_one(ProcessTable)
-        top.processes = data.get_processes()
+        self.processes.query_processes()
+        top.processes = self.processes
 
         self.cpu.update()
         cpu_meters = self.query(".cpu").results(CPUUsage)
         for i, meter in enumerate(cpu_meters):
             meter.progress = self.cpu.cores[i]
+
+        tasks = self.query_one(Tasks)
+        tasks.num_tasks = self.processes.num_tasks
+        tasks.num_threads = self.processes.num_threads
+        tasks.num_kthreads = self.processes.num_kthreads
+        tasks.num_running = self.processes.num_running
 
     def compose(self) -> ComposeResult:
         yield Vertical(
@@ -95,7 +96,7 @@ class Main(Screen):
                         CPUUsage("15", classes="cpu"),
                         classes="meter-row",
                     ),
-                    Placeholder("Tasks", classes="meter"),
+                    Tasks(classes="meter"),
                     LoadAverage(classes="meter"),
                     Uptime(classes="meter"),
                     id="col2",

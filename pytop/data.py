@@ -7,6 +7,7 @@ from rich.text import Text
 from dataclasses import dataclass
 import os
 
+
 STATUS = {
     psutil.STATUS_RUNNING: "R",
     psutil.STATUS_SLEEPING: "S",
@@ -21,25 +22,6 @@ STATUS = {
 }
 
 USERNAME = os.getlogin()
-
-
-def get_processes() -> dict[str, Process]:
-    processes = {
-        str(p.pid): Process(
-            p.pid,
-            p.name(),
-            p.username(),
-            p.nice(),
-            p.memory_info(),
-            p.status(),
-            p.cpu_percent(),
-            p.memory_percent(),
-            p.cpu_times(),
-            p.cmdline(),
-        )
-        for p in psutil.process_iter()
-    }
-    return processes
 
 
 @dataclass(order=True, eq=True)
@@ -153,6 +135,7 @@ class Process:
     def __init__(
         self,
         pid: int,
+        ppid: int,
         name: str,
         username: str,
         nice: int,
@@ -161,9 +144,11 @@ class Process:
         cpu_percent: float,
         memory_percent: float,
         cpu_times: pcputimes,
+        num_threads: int,
         cmdline: Optional[List[str]] = None,
     ):
         self.pid = PID(pid)
+        self.ppid = ppid
         self.name = name
         self.username = Username(username)
         self.nice = Nice(nice)
@@ -178,11 +163,57 @@ class Process:
 
         user, system = cpu_times.user, cpu_times.system
         self.cpu_times = CPUTimes(user, system)
+        self.num_threads = num_threads
 
         if cmdline is None:
             self.cmdline = name
         else:
             self.cmdline = "".join(cmdline)
+
+
+class Processes(dict):
+    def __init__(self):
+        self.num_tasks = 0
+        self.num_threads = 0
+        self.num_kthreads = 0
+        self.num_running = 0
+
+        self.query_processes()
+
+    def query_processes(self):
+        processes = {
+            str(p.pid): Process(
+                p.pid,
+                p.ppid(),
+                p.name(),
+                p.username(),
+                p.nice(),
+                p.memory_info(),
+                p.status(),
+                p.cpu_percent(),
+                p.memory_percent(),
+                p.cpu_times(),
+                p.num_threads(),
+                p.cmdline(),
+            )
+            for p in psutil.process_iter()
+        }
+
+        super().__init__(processes)
+        self.num_tasks, self.num_threads, self.num_kthreads, self.num_running = (
+            0,
+            0,
+            0,
+            0,
+        )
+        for p in self:
+            if self[p].ppid != 2:
+                self.num_tasks += 1
+            if not self[p].cmdline:
+                self.num_kthreads += 1
+            if self[p].status == psutil.STATUS_RUNNING:
+                self.num_running += 1
+            self.num_threads += self[p].num_threads
 
 
 class CPU:
