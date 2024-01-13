@@ -2,10 +2,14 @@ from textual.reactive import Reactive
 from textual.widgets import Static
 from .text_progress_bar import TextProgressBar
 import psutil
+from psutil._pslinux import svmem
+from psutil._common import sswap
 from time import time
 
 
 class CPUUsage(TextProgressBar):
+    """A meter for displaying CPU usage (per core) as a text progress meter"""
+
     def __init__(
         self,
         label: str,
@@ -14,21 +18,33 @@ class CPUUsage(TextProgressBar):
         id: str | None = None,
         classes: str | None = None,
     ):
-        super().__init__(label, 100.0, "percent", name=name, id=id, classes=classes)
+        self.label = label
+        super().__init__(label, "percent", name=name, id=id, classes=classes)
 
 
 class MemoryUsage(TextProgressBar):
+    """A meter for displaying memory usage as a text progress meter"""
+
     def __init__(
         self,
         label: str,
-        total: float,
         *,
         name: str | None = None,
         id: str | None = None,
         classes: str | None = None,
     ):
-        self._total_readout = self._convert_units(total)
-        super().__init__(label, total, "proportion", name=name, id=id, classes=classes)
+        self.label = label
+        super().__init__(label, "proportion", name=name, id=id, classes=classes)
+
+    def watch_total(self, total):
+        self.total_readout = self._convert_units(total)
+
+    def compute__readout(self) -> str:
+        if self.progress is None or self.total is None:
+            return f"-/-"
+        used = self._convert_units(self.progress)
+        total = self._convert_units(self.total)
+        return f"{used}/{total}"
 
     def _convert_units(self, data: int | float):
         units = {0: "K", 1: "K", 2: "M", 3: "G", 4: "T"}
@@ -44,12 +60,41 @@ class MemoryUsage(TextProgressBar):
         else:
             return f"{str(round(data, 1))}{units[unit_key]}"
 
-    def compute__readout(self) -> str:
-        if self.progress is None or self.total is None:
-            return f"-/-"
-        used = self._convert_units(self.progress)
-        total = self._convert_units(self.total)
-        return f"{used}/{total}"
+
+class RAMUsage(MemoryUsage):
+    """A meter for displaying Random Access Memory (RAM) usage"""
+
+    virtual_memory: Reactive[svmem] = Reactive(psutil.virtual_memory)
+
+    def on_mount(self):
+        self.progress = self.virtual_memory.used
+        self.total = self.virtual_memory.total
+        self.set_interval(1.5, self.update_virtual_memory)
+
+    def update_virtual_memory(self):
+        self.virtual_memory = psutil.virtual_memory()
+
+    def watch_virtual_memory(self):
+        self.progress = self.virtual_memory.used
+        self.update()
+
+
+class SwapUsage(MemoryUsage):
+    """A meter for displaying swap memory usage"""
+
+    swap_memory: Reactive[sswap] = Reactive(psutil.swap_memory)
+
+    def on_mount(self):
+        self.progress = self.swap_memory.used
+        self.total = self.swap_memory.total
+        self.set_interval(1.5, self.update_swap_memory)
+
+    def update_swap_memory(self):
+        self.swap_memory = psutil.swap_memory()
+
+    def watch_swap_memory(self):
+        self.progress = self.swap_memory.used
+        self.update()
 
 
 class LoadAverage(Static):

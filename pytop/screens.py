@@ -3,7 +3,13 @@ from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Footer, Placeholder
 from .widgets.process_table import ProcessTable
-from .widgets.meters import LoadAverage, Uptime, CPUUsage, MemoryUsage
+from .widgets.meters import (
+    LoadAverage,
+    Uptime,
+    CPUUsage,
+    RAMUsage,
+    SwapUsage,
+)
 from textual.containers import Horizontal, Vertical
 from . import data
 
@@ -11,8 +17,6 @@ from . import data
 class Main(Screen):
     processes = data.get_processes()
     cpu = data.CPU()
-    virtual_memory = data.VirtualMemory()
-    swap_memory = data.SwapMemory()
 
     BINDINGS = [
         Binding(key="F1", action="help", description="Help"),
@@ -42,14 +46,6 @@ class Main(Screen):
         for i, meter in enumerate(cpu_meters):
             meter.progress = self.cpu.cores[i]
 
-        self.virtual_memory.update()
-        virtual_memory_meter = self.query_one(".virt-memory", MemoryUsage)
-        virtual_memory_meter.progress = self.virtual_memory.used
-
-        self.swap_memory.update()
-        swap_memory_meter = self.query_one(".swap-memory", MemoryUsage)
-        swap_memory_meter.progress = self.swap_memory.used
-
     def compose(self) -> ComposeResult:
         yield Vertical(
             Horizontal(
@@ -74,10 +70,8 @@ class Main(Screen):
                         CPUUsage("7", classes="cpu"),
                         classes="meter-row",
                     ),
-                    MemoryUsage(
-                        "Mem", self.virtual_memory.total, classes="virt-memory"
-                    ),
-                    MemoryUsage("Swp", self.swap_memory.total, classes="swap-memory"),
+                    RAMUsage("Mem", classes="virt-memory"),
+                    SwapUsage("Swp", classes="swap-memory"),
                     id="col1",
                 ),
                 Vertical(

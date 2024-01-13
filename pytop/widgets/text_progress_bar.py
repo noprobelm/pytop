@@ -1,5 +1,5 @@
 from typing import Optional
-from textual.widget import Widget
+from textual.widgets import Static
 from textual.reactive import Reactive
 from typing_extensions import Literal
 from rich.text import Text
@@ -7,7 +7,7 @@ from rich.text import Text
 ReadoutType = Literal["percent", "proportion"]
 
 
-class TextProgressBar(Widget):
+class TextProgressBar(Static):
     progress: Reactive[float | None] = Reactive[Optional[float]](None)
     total: Reactive[float | None] = Reactive[Optional[float]](None)
     readout_type: Reactive[ReadoutType] = Reactive[ReadoutType]("percent")
@@ -42,7 +42,6 @@ class TextProgressBar(Widget):
     def __init__(
         self,
         label: str,
-        total: float,
         readout_type: ReadoutType,
         *,
         name: str | None = None,
@@ -50,11 +49,12 @@ class TextProgressBar(Widget):
         classes: str | None = None,
     ):
         super().__init__(name=name, id=id, classes=classes)
-        self.label = label
-        self.total = total
-        self.readout_type = readout_type
         self.left_bound = "["
         self.right_bound = "]"
+        self.label = label
+        self.readout_type = readout_type
+        if self.readout_type == "percent":
+            self.total = 100.0
 
     def compute__readout(self) -> str:
         if self.progress is None or self.total is None:
