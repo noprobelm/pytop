@@ -1,11 +1,7 @@
 from typing import Optional
-from textual.app import ComposeResult, RenderResult
 from textual.widget import Widget
-from textual.widgets import DataTable, Placeholder, Static, TextArea, Label
-from textual.containers import Container, Horizontal, Vertical
-from textual.reactive import reactive, Reactive
+from textual.reactive import Reactive
 from typing_extensions import Literal
-from .data import Process
 from rich.text import Text
 
 ReadoutType = Literal["percent", "memory", "proportion"]
