@@ -3,7 +3,7 @@ from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Footer, Placeholder, ProgressBar
 from .widgets import ProcessTable
-from .meter import TextMeter
+from .meter import TextProgressBar
 from textual.containers import Container, Horizontal, Vertical, Grid
 from . import data
 
@@ -37,7 +37,7 @@ class Main(Screen):
         top.processes = data.get_processes()
 
         self.cpu.update()
-        cpu_meters = self.query(".cpu").results(TextMeter)
+        cpu_meters = self.query(".cpu").results(TextProgressBar)
         for i, meter in enumerate(cpu_meters):
             meter.progress = self.cpu.cores[i]
 
@@ -51,48 +51,48 @@ class Main(Screen):
             Horizontal(
                 Vertical(
                     Horizontal(
-                        TextMeter("0", 25.0, 100.0, "percent", classes="cpu"),
-                        TextMeter("1", 25.0, 100.0, "percent", classes="cpu"),
+                        TextProgressBar("0", 100.0, "percent", classes="cpu"),
+                        TextProgressBar("1", 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextMeter("2", 25.0, 100.0, "percent", classes="cpu"),
-                        TextMeter("3", 25.0, 100.0, "percent", classes="cpu"),
+                        TextProgressBar("2", 100.0, "percent", classes="cpu"),
+                        TextProgressBar("3", 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextMeter("4", 25.0, 100.0, "percent", classes="cpu"),
-                        TextMeter("5", 25.0, 100.0, "percent", classes="cpu"),
+                        TextProgressBar("4", 100.0, "percent", classes="cpu"),
+                        TextProgressBar("5", 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextMeter("6", 25.0, 100.0, "percent", classes="cpu"),
-                        TextMeter("7", 25.0, 100.0, "percent", classes="cpu"),
+                        TextProgressBar("6", 100.0, "percent", classes="cpu"),
+                        TextProgressBar("7", 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
-                    TextMeter("Mem", 25.0, 100.0, "proportion", classes="memory"),
+                    TextProgressBar("Mem", 100.0, "memory", classes="memory"),
                     Placeholder("Swap", classes="meter"),
                     id="col1",
                 ),
                 Vertical(
                     Horizontal(
-                        TextMeter("8", 25.0, 100.0, "percent", classes="cpu"),
-                        TextMeter("9", 25.0, 100.0, "percent", classes="cpu"),
+                        TextProgressBar("8", 100.0, "percent", classes="cpu"),
+                        TextProgressBar("9", 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextMeter("10", 25.0, 100.0, "percent", classes="cpu"),
-                        TextMeter("11", 25.0, 100.0, "percent", classes="cpu"),
+                        TextProgressBar("10", 100.0, "percent", classes="cpu"),
+                        TextProgressBar("11", 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextMeter("12", 25.0, 100.0, "percent", classes="cpu"),
-                        TextMeter("13", 25.0, 100.0, "percent", classes="cpu"),
+                        TextProgressBar("12", 100.0, "percent", classes="cpu"),
+                        TextProgressBar("13", 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextMeter("14", 25.0, 100.0, "percent", classes="cpu"),
-                        TextMeter("15", 25.0, 100.0, "percent", classes="cpu"),
+                        TextProgressBar("14", 100.0, "percent", classes="cpu"),
+                        TextProgressBar("15", 100.0, "percent", classes="cpu"),
                         classes="meter-row",
                     ),
                     Placeholder("Tasks", classes="meter"),

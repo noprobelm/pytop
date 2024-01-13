@@ -1,3 +1,4 @@
+from typing import Optional
 from textual.app import ComposeResult, RenderResult
 from textual.widget import Widget
 from textual.widgets import DataTable, Placeholder, Static, TextArea, Label
@@ -10,45 +11,42 @@ from rich.text import Text
 ReadoutType = Literal["percent", "memory", "proportion"]
 
 
-class Readout(Static):
-    pass
-
-
-class PercentReadout(Static):
-    progress = reactive(float)
-
-    def __init__(
-        self,
-        progress: float,
-        *,
-        name: str | None = None,
-        id: str | None = None,
-        classes: str | None = None,
-    ):
-        super().__init__(name=name, id=id, classes=classes)
-        self.progress = progress
-
-    def on_mount(self):
-        return f"{self.progress}%"
-
-
-class TextMeter(Widget):
-    label = reactive("")
-    progress = reactive(0.0)
-    total = reactive(0.0)
-    readout = reactive("")
+class TextProgressBar(Widget):
+    progress: Reactive[float | None] = Reactive[Optional[float]](None)
+    total: Reactive[float | None] = Reactive[Optional[float]](None)
     readout_type: Reactive[ReadoutType] = Reactive[ReadoutType]("percent")
+    _readout: Reactive[str] = Reactive("0.0%")
+    _bars: Reactive[str] = Reactive("")
+
+    COMPONENT_CLASSES = {
+        "textprogressbar--label",
+        "textprogressbar--bound",
+        "textprogressbar--readout",
+        "textprogressbar--bars",
+    }
 
     DEFAULT_CSS = """
-    TextMeter {
-        width: 1fr;
+    TextProgressBar .textprogressbar--label {
+        color: $primary-lighten-3;
     }
+
+    TextProgressBar .textprogressbar--bound {
+        color: $accent-lighten-3;
+    }
+
+    TextProgressBar .textprogressbar--readout {
+        color: $secondary-background-lighten-2;
+    }
+
+    TextProgressBar .textprogressbar--bars {
+        color: $secondary
+    }
+
     """
 
     def __init__(
         self,
         label: str,
-        progress: float,
         total: float,
         readout_type: ReadoutType,
         *,
@@ -58,33 +56,81 @@ class TextMeter(Widget):
     ):
         super().__init__(name=name, id=id, classes=classes)
         self.label = label
-        self.progress = progress
         self.total = total
         self.readout_type = readout_type
-        self.compute_readout()
+        self.left_bound = "["
+        self.right_bound = "]"
 
-    def validate_progress(self, progress: float):
-        if progress == 0.0:
-            return 0.1
-        return progress
+    def _convert_units(self, data: int | float):
+        units = {0: "K", 1: "K", 2: "M", 3: "G", 4: "T"}
+        unit_key = 0
+        while data > 1024:
+            data = data // 1024
+            unit_key += 1
 
-    def validate_total(self, total: float):
-        if total == 0.0:
-            return 0.1
-        return total
+        if unit_key == 0:
+            return "0K"
+        elif unit_key == 4:
+            return f">{str(round(data, 2))}{units[unit_key]}"
+        else:
+            return f"{str(round(data, 2))}{units[unit_key]}"
 
-    def compute_readout(self) -> str:
+    def compute__readout(self) -> str:
+        if self.progress is None or self.total is None:
+            return f"-/-"
         match self.readout_type:
             case "percent":
-                return f"{self.total}%"
+                return f"{self.progress}%"
+            case "memory":
+                used = self._convert_units(self.progress)
+                total = self._convert_units(self.total)
+                return f"{used}/{total}"
             case "proportion":
                 return f"{self.progress}/{self.total}"
 
-    def render(self):
-        progress_region_width = (
-            self.size.width - 4 - len(self.label) - len(str(self.readout))
+    def compute__bars(self) -> str:
+        bar_region = self.size.width - len(self.label) - len(self._readout) - 2
+        if self.progress is None or self.total is None:
+            return " " * bar_region
+
+        bars = "|" * int(bar_region * self.progress / self.total)
+        whitespace = " " * (bar_region - len(bars))
+        return f"{bars}{whitespace}"
+
+    def render(self) -> Text:
+        #        label = self.get_component_rich_style("textprogressbar--label")
+        label = self.get_component_rich_style("textprogressbar--label")
+        progress_bar = Text()
+        progress_bar.append_text(
+            Text(
+                self.label,
+                style=self.get_component_rich_style("textprogressbar--label"),
+            )
+        )
+        progress_bar.append_text(
+            Text(
+                self.left_bound,
+                style=self.get_component_rich_style("textprogressbar--bound"),
+            )
+        )
+        progress_bar.append_text(
+            Text(
+                self._bars,
+                style=self.get_component_rich_style("textprogressbar--bars"),
+            ),
+        )
+        progress_bar.append_text(
+            Text(
+                self._readout,
+                style=self.get_component_rich_style("textprogressbar--readout"),
+            )
+        )
+        progress_bar.append_text(
+            Text(
+                self.right_bound,
+                style=self.get_component_rich_style("textprogressbar--bound"),
+            )
         )
 
-        num_bars = int(progress_region_width * self.progress // self.total)
-        num_whitespace = progress_region_width - num_bars
-        return f"{self.label}[{'[bold green]|' * num_bars}{' ' * num_whitespace}{self.readout}]"
+        return progress_bar
+        return f"{label}"
