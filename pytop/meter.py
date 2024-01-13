@@ -4,7 +4,7 @@ from textual.reactive import Reactive
 from typing_extensions import Literal
 from rich.text import Text
 
-ReadoutType = Literal["percent", "memory", "proportion"]
+ReadoutType = Literal["percent", "proportion"]
 
 
 class TextProgressBar(Widget):
