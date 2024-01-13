@@ -32,20 +32,20 @@ class Main(Screen):
         self.update_data()
 
     def update_data(self) -> None:
-        top = self.query_one(ProcessTable)
         self.processes.query_processes()
-        top.processes = self.processes
-
-        self.cpu.update()
-        cpu_meters = self.query(".cpu").results(CPUUsage)
-        for i, meter in enumerate(cpu_meters):
-            meter.progress = self.cpu.cores[i]
+        top = self.query_one(ProcessTable)
+        top.processes = self.processes.processes
 
         tasks = self.query_one(Tasks)
         tasks.num_tasks = self.processes.num_tasks
         tasks.num_threads = self.processes.num_threads
         tasks.num_kthreads = self.processes.num_kthreads
         tasks.num_running = self.processes.num_running
+
+        self.cpu.update()
+        cpu_meters = self.query(".cpu").results(CPUUsage)
+        for i, meter in enumerate(cpu_meters):
+            meter.progress = self.cpu.cores[i]
 
     def compose(self) -> ComposeResult:
         yield Vertical(

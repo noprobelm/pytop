@@ -171,49 +171,50 @@ class Process:
             self.cmdline = "".join(cmdline)
 
 
-class Processes(dict):
+class Processes:
     def __init__(self):
-        self.num_tasks = 0
-        self.num_threads = 0
-        self.num_kthreads = 0
-        self.num_running = 0
-
-        self.query_processes()
-
-    def query_processes(self):
-        processes = {
-            str(p.pid): Process(
-                p.pid,
-                p.ppid(),
-                p.name(),
-                p.username(),
-                p.nice(),
-                p.memory_info(),
-                p.status(),
-                p.cpu_percent(),
-                p.memory_percent(),
-                p.cpu_times(),
-                p.num_threads(),
-                p.cmdline(),
-            )
-            for p in psutil.process_iter()
-        }
-
-        super().__init__(processes)
         self.num_tasks, self.num_threads, self.num_kthreads, self.num_running = (
             0,
             0,
             0,
             0,
         )
-        for p in self:
-            if self[p].ppid != 2:
+        self.processes = {}
+        self.query_processes()
+
+    def query_processes(self):
+        self.processes = {}
+        self.num_tasks, self.num_threads, self.num_kthreads, self.num_running = (
+            0,
+            0,
+            0,
+            0,
+        )
+        process_data = psutil.process_iter()
+        for data in process_data:
+            process = Process(
+                data.pid,
+                data.ppid(),
+                data.name(),
+                data.username(),
+                data.nice(),
+                data.memory_info(),
+                data.status(),
+                data.cpu_percent(),
+                data.memory_percent(),
+                data.cpu_times(),
+                data.num_threads(),
+                data.cmdline(),
+            )
+            if process.ppid != 2:
                 self.num_tasks += 1
-            if not self[p].cmdline:
+            if not process.cmdline:
                 self.num_kthreads += 1
-            if self[p].status == psutil.STATUS_RUNNING:
+            if process.status == psutil.STATUS_RUNNING:
                 self.num_running += 1
-            self.num_threads += self[p].num_threads
+            self.num_threads += process.num_threads
+
+            self.processes[str(process.pid)] = process
 
 
 class CPU:
