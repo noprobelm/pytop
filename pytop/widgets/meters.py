@@ -7,6 +7,14 @@ from psutil._common import sswap
 from time import time
 
 
+class Meter(Static):
+    def on_mount(self):
+        self.update_meter = self.set_interval(1.5, self.update_data)
+
+    def update_data(self):
+        pass
+
+
 class CPUUsage(TextProgressBar):
     """A meter for displaying CPU usage (per core) as a text progress meter"""
 
@@ -69,7 +77,13 @@ class RAMUsage(MemoryUsage):
     def on_mount(self):
         self.progress = self.virtual_memory.used
         self.total = self.virtual_memory.total
-        self.set_interval(1.5, self.update_virtual_memory)
+        self.update_data = self.set_interval(1.5, self.update_virtual_memory)
+
+    def start(self):
+        self.update_data.pause()
+
+    def stop(self):
+        self.update_data.resume()
 
     def update_virtual_memory(self):
         self.virtual_memory = psutil.virtual_memory()
@@ -87,7 +101,13 @@ class SwapUsage(MemoryUsage):
     def on_mount(self):
         self.progress = self.swap_memory.used
         self.total = self.swap_memory.total
-        self.set_interval(1.5, self.update_swap_memory)
+        self.update_data = self.set_interval(1.5, self.update_swap_memory)
+
+    def start(self):
+        self.update_data.pause()
+
+    def stop(self):
+        self.update_data.resume()
 
     def update_swap_memory(self):
         self.swap_memory = psutil.swap_memory()
@@ -97,15 +117,12 @@ class SwapUsage(MemoryUsage):
         self.update()
 
 
-class LoadAverage(Static):
+class LoadAverage(Meter):
     """A meter for displaying 1, 5, and 15 minute CPU load averages"""
 
     load_avg: Reactive[tuple] = Reactive(psutil.getloadavg)
 
-    def on_mount(self) -> None:
-        self.set_interval(1.5, self.update_load_avg)
-
-    def update_load_avg(self) -> None:
+    def update_data(self) -> None:
         self.load_avg = psutil.getloadavg()
 
     def watch_loadavg(self) -> None:
@@ -120,16 +137,13 @@ class LoadAverage(Static):
         return f"Load average: {round(self.one, 2)} {round(self.five, 2)} {round(self.fifteen, 2)}"
 
 
-class Uptime(Static):
+class Uptime(Meter):
     """A meter for displaying time elapsed since system boot"""
 
     boot_time = psutil.boot_time()
     current_time: Reactive[float] = Reactive(time)
 
-    def on_mount(self) -> None:
-        self.set_interval(1.5, self.update_time)
-
-    def update_time(self) -> None:
+    def update_data(self) -> None:
         self.current_time = time()
 
     def watch_current_time(self) -> None:
@@ -142,7 +156,7 @@ class Uptime(Static):
         return f"Uptime: {int(h):02d}:{int(m):02d}:{int(s):02d}"
 
 
-class Tasks(Static):
+class Tasks(Meter):
     """A meter for displaying number of tasks running"""
 
     num_tasks: Reactive[int] = Reactive(0)
