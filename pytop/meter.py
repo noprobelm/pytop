@@ -132,4 +132,3 @@ class TextProgressBar(Widget):
         )
 
         return progress_bar
-        return f"{label}"
