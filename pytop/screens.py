@@ -2,7 +2,7 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Footer, Placeholder
-from .widgets import ProcessTable
+from .widgets import ProcessTable, LoadAverage
 from .meter import CPUUsage, MemoryUsage
 from textual.containers import Horizontal, Vertical
 from . import data
@@ -102,7 +102,7 @@ class Main(Screen):
                         classes="meter-row",
                     ),
                     Placeholder("Tasks", classes="meter"),
-                    Placeholder("Load Average", classes="meter"),
+                    LoadAverage(classes="meter"),
                     Placeholder("Uptime", classes="meter"),
                     id="col2",
                 ),
