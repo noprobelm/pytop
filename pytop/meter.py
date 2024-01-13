@@ -98,7 +98,6 @@ class TextProgressBar(Widget):
 
     def render(self) -> Text:
         #        label = self.get_component_rich_style("textprogressbar--label")
-        label = self.get_component_rich_style("textprogressbar--label")
         progress_bar = Text()
         progress_bar.append_text(
             Text(
