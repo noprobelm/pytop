@@ -1,10 +1,10 @@
 from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.binding import Binding
-from textual.widgets import Footer, Placeholder, ProgressBar
+from textual.widgets import Footer, Placeholder
 from .widgets import ProcessTable
-from .meter import TextProgressBar, CPUUsage, MemoryUsage
-from textual.containers import Container, Horizontal, Vertical, Grid
+from .meter import CPUUsage, MemoryUsage
+from textual.containers import Horizontal, Vertical
 from . import data
 
 
