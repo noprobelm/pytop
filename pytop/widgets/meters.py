@@ -47,3 +47,15 @@ class Uptime(Static):
         m, s = divmod(uptime_seconds, 60)
         h, m = divmod(m, 60)
         return f"Uptime: {int(h):02d}:{int(m):02d}:{int(s):02d}"
+
+
+class Tasks(Static):
+    """A meter for displaying number of tasks running"""
+
+    num_tasks: Reactive[int] = Reactive(0)
+    num_threads: Reactive[int] = Reactive(0)
+    num_kthreads: Reactive[int] = Reactive(0)
+    num_running: Reactive[int] = Reactive(0)
+
+    def render(self) -> str:
+        return f"Tasks: {self.num_tasks}, {self.num_threads} thr, {self.num_kthreads} kthr; {self.num_running} running"
