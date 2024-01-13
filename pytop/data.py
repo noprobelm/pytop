@@ -5,8 +5,6 @@ from psutil._common import pcputimes
 from typing import List, Optional
 from rich.text import Text
 from dataclasses import dataclass
-from textual.widget import Widget
-from textual.reactive import reactive
 import os
 
 STATUS = {
@@ -222,3 +220,17 @@ class VirtualMemory:
         virt = psutil.virtual_memory()
         self.free = virt.free
         self.used = virt.used
+
+
+class LoadAverage:
+    one = 0
+    five = 0
+    fifteen = 0
+
+    def __init__(self):
+        load_avg = psutil.getloadavg()
+        self.one, self.five, self.fifteen = load_avg[0], load_avg[1], load_avg[2]
+
+    def update(self):
+        load_avg = psutil.getloadavg()
+        self.one, self.five, self.fifteen = load_avg[0], load_avg[1], load_avg[2]

@@ -35,7 +35,7 @@ class TextProgressBar(Widget):
     }
 
     TextProgressBar .textprogressbar--bars {
-        color: $secondary
+        color: $success
     }
     """
 
