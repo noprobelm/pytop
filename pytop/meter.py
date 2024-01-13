@@ -41,7 +41,6 @@ class TextProgressBar(Widget):
     TextProgressBar .textprogressbar--bars {
         color: $secondary
     }
-
     """
 
     def __init__(
