@@ -3,7 +3,7 @@ from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Footer, Placeholder, ProgressBar
 from .widgets import ProcessTable
-from .meter import TextProgressBar
+from .meter import TextProgressBar, CPUUsage, MemoryUsage
 from textual.containers import Container, Horizontal, Vertical, Grid
 from . import data
 
@@ -37,62 +37,61 @@ class Main(Screen):
         top.processes = data.get_processes()
 
         self.cpu.update()
-        cpu_meters = self.query(".cpu").results(TextProgressBar)
+        cpu_meters = self.query(".cpu").results(CPUUsage)
         for i, meter in enumerate(cpu_meters):
             meter.progress = self.cpu.cores[i]
 
         self.virtual_memory.update()
-        virtual_memory_meter = self.query_one(".memory")
+        virtual_memory_meter = self.query_one(".memory", MemoryUsage)
         virtual_memory_meter.progress = self.virtual_memory.used
-        virtual_memory_meter.total = self.virtual_memory.free + self.virtual_memory.used
 
     def compose(self) -> ComposeResult:
         yield Vertical(
             Horizontal(
                 Vertical(
                     Horizontal(
-                        TextProgressBar("0", 100.0, "percent", classes="cpu"),
-                        TextProgressBar("1", 100.0, "percent", classes="cpu"),
+                        CPUUsage("0", classes="cpu"),
+                        CPUUsage("1", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextProgressBar("2", 100.0, "percent", classes="cpu"),
-                        TextProgressBar("3", 100.0, "percent", classes="cpu"),
+                        CPUUsage("2", classes="cpu"),
+                        CPUUsage("3", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextProgressBar("4", 100.0, "percent", classes="cpu"),
-                        TextProgressBar("5", 100.0, "percent", classes="cpu"),
+                        CPUUsage("4", classes="cpu"),
+                        CPUUsage("5", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextProgressBar("6", 100.0, "percent", classes="cpu"),
-                        TextProgressBar("7", 100.0, "percent", classes="cpu"),
+                        CPUUsage("6", classes="cpu"),
+                        CPUUsage("7", classes="cpu"),
                         classes="meter-row",
                     ),
-                    TextProgressBar("Mem", 100.0, "memory", classes="memory"),
+                    MemoryUsage("Mem", self.virtual_memory.total, classes="memory"),
                     Placeholder("Swap", classes="meter"),
                     id="col1",
                 ),
                 Vertical(
                     Horizontal(
-                        TextProgressBar("8", 100.0, "percent", classes="cpu"),
-                        TextProgressBar("9", 100.0, "percent", classes="cpu"),
+                        CPUUsage("8", classes="cpu"),
+                        CPUUsage("9", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextProgressBar("10", 100.0, "percent", classes="cpu"),
-                        TextProgressBar("11", 100.0, "percent", classes="cpu"),
+                        CPUUsage("10", classes="cpu"),
+                        CPUUsage("11", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextProgressBar("12", 100.0, "percent", classes="cpu"),
-                        TextProgressBar("13", 100.0, "percent", classes="cpu"),
+                        CPUUsage("12", classes="cpu"),
+                        CPUUsage("13", classes="cpu"),
                         classes="meter-row",
                     ),
                     Horizontal(
-                        TextProgressBar("14", 100.0, "percent", classes="cpu"),
-                        TextProgressBar("15", 100.0, "percent", classes="cpu"),
+                        CPUUsage("14", classes="cpu"),
+                        CPUUsage("15", classes="cpu"),
                         classes="meter-row",
                     ),
                     Placeholder("Tasks", classes="meter"),

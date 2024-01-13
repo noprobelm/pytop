@@ -210,11 +210,13 @@ class CPU:
 class VirtualMemory:
     free = 0
     used = 0
+    totla = 0
 
     def __init__(self):
         virt = psutil.virtual_memory()
         self.free = virt.free
         self.used = virt.used
+        self.total = virt.total
 
     def update(self):
         virt = psutil.virtual_memory()
