@@ -208,7 +208,7 @@ class CPU:
 class VirtualMemory:
     free = 0
     used = 0
-    totla = 0
+    total = 0
 
     def __init__(self):
         virt = psutil.virtual_memory()
@@ -220,6 +220,23 @@ class VirtualMemory:
         virt = psutil.virtual_memory()
         self.free = virt.free
         self.used = virt.used
+
+
+class SwapMemory:
+    free = 0
+    used = 0
+    total = 0
+
+    def __init__(self):
+        swap = psutil.swap_memory()
+        self.free = swap.free
+        self.used = swap.used
+        self.total = swap.total
+
+    def update(self):
+        swap = psutil.swap_memory()
+        self.free = swap.free
+        self.used = swap.used
 
 
 class LoadAverage:
