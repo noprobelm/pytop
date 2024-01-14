@@ -1,9 +1,10 @@
-from textual.reactive import reactive
+from textual.reactive import Reactive
 from textual.widgets import DataTable
+from ..data.data import Process
 
 
 class ProcessTable(DataTable):
-    processes = reactive({})
+    processes: Reactive[dict[str, Process]] = Reactive({})
     current_sort = ("CPU%", True)
 
     def on_mount(self):
