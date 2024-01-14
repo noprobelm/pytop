@@ -8,17 +8,12 @@
     padding: 0 1 0 1;
 }
 
-.meter {
-    height: 1;
-    width: 1fr;
-}
 .meter-row {
     height: 1;
     width: 100%;
 }
 
 #top {
-    box-sizing: content-box;
     height: auto;
 }
 
@@ -40,6 +35,6 @@ ProcessTable {
 
 #col1, #col2 {
     layout: grid;
-    padding: 1;
     height: auto;
+    padding: 1;
 }

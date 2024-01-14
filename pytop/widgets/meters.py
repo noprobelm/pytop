@@ -1,5 +1,7 @@
+from textual.app import ComposeResult
 from textual.reactive import Reactive
-from textual.widgets import Static
+from textual.widgets import Static, Label
+from textual.containers import Container, Horizontal, Vertical, Grid
 from .text_progress_bar import TextProgressBar
 import psutil
 from psutil._pslinux import svmem
@@ -186,5 +188,10 @@ class Tasks(Meter):
     num_kthreads: Reactive[int] = Reactive(0)
     num_running: Reactive[int] = Reactive(0)
 
-    def render(self) -> str:
-        return f"Tasks: {self.num_tasks}, {self.num_threads} thr, {self.num_kthreads} kthr; {self.num_running} running"
+    def compose(self) -> ComposeResult:
+        with Horizontal():
+            yield Label("Tasks: ")
+            yield Static(f"{self.num_tasks}")
+
+    # def render(self) -> str:
+    #     return f"Tasks: {self.num_tasks}, {self.num_threads} thr, {self.num_kthreads} kthr; {self.num_running} running"
