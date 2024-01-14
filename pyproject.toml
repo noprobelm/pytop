@@ -19,3 +19,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 'pytop' = 'pytop.__main__:main'
+
+[[tool.mypy.overrides]]
+module = "psutil.*"
+ignore_missing_imports = true

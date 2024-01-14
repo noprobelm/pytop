@@ -219,20 +219,22 @@ class Processes:
 
 
 class CPU:
-    cores = {}
+    cores: dict[int, float] = {}
 
     def __init__(self):
+        # psutil is not heavily typed. We should switch to the 3rd party
         self.cores.update(
             {
                 core: percent
-                for core, percent in enumerate(psutil.cpu_percent(percpu=True))
+                for core, percent in enumerate(psutil.cpu_percent(percpu=True))  # type: ignore
             }
         )
 
     def update(self):
+        # psutil is not heavily typed. We should switch to the 3rd party
         self.cores.update(
             {
                 core: percent
-                for core, percent in enumerate(psutil.cpu_percent(percpu=True))
+                for core, percent in enumerate(psutil.cpu_percent(percpu=True))  # type: ignore
             }
         )
