@@ -8,6 +8,14 @@ from time import time
 
 
 class Meter(Static):
+    DEFAULT_CSS = """
+    Meter {
+        height: 1;
+        width: 1fr;
+        padding-right: 1;
+    }
+    """
+
     def on_mount(self):
         self.update_meter = self.set_interval(1.5, self.update_data)
 
@@ -17,6 +25,13 @@ class Meter(Static):
 
 class CPUUsage(TextProgressBar):
     """A meter for displaying CPU usage (per core) as a text progress meter"""
+
+    DEFAULT_CSS = """
+    CPUUsage {
+        height: 1;
+        width: 1fr;
+    }
+    """
 
     def __init__(
         self,
@@ -32,6 +47,13 @@ class CPUUsage(TextProgressBar):
 
 class MemoryUsage(TextProgressBar):
     """A meter for displaying memory usage as a text progress meter"""
+
+    DEFAULT_CSS = """
+    MemoryUsage {
+        height: 1;
+        width: 1fr;
+    }
+    """
 
     def __init__(
         self,
