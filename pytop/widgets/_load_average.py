@@ -39,7 +39,7 @@ class LoadAverage(Static):
     def update_loadavg(self) -> None:
         self.load_avg = psutil.getloadavg()
 
-    def render(self) -> str:
+    def render(self) -> Text:
         self.one, self.five, self.fifteen = (
             self.load_avg[0],
             self.load_avg[1],
