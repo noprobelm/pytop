@@ -120,7 +120,7 @@ class CPUUsage(TextProgressBar):
         id: str | None = None,
         classes: str | None = None,
     ):
-        super().__init__(label, 100.0, "percent", name=name, id=id, classes=classes)
+        super().__init__(label, "percent", name=name, id=id, classes=classes)
 
 
 class MemoryUsage(TextProgressBar):
@@ -134,7 +134,7 @@ class MemoryUsage(TextProgressBar):
         classes: str | None = None,
     ):
         self._total_readout = self._convert_units(total)
-        super().__init__(label, total, "proportion", name=name, id=id, classes=classes)
+        super().__init__(label, "proportion", name=name, id=id, classes=classes)
 
     def _convert_units(self, data: int | float):
         units = {0: "K", 1: "K", 2: "M", 3: "G", 4: "T"}
