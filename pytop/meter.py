@@ -27,7 +27,7 @@ class TextProgressBar(Widget):
     }
 
     TextProgressBar .textprogressbar--bound {
-        color: $accent-lighten-3;
+        color: $secondary;
     }
 
     TextProgressBar .textprogressbar--readout {

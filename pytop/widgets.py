@@ -1,7 +1,9 @@
 from textual.widget import Widget
 from textual.widgets import DataTable, Static
+from textual.containers import Container, Horizontal, Vertical
 from textual.reactive import reactive, Reactive
 from typing_extensions import Literal
+from .data import Process
 import psutil
 from datetime import datetime, timedelta
 

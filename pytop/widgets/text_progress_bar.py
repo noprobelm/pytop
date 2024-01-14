@@ -27,15 +27,15 @@ class TextProgressBar(Static):
     }
 
     TextProgressBar .textprogressbar--bound {
-        color: $accent-lighten-3;
+        color: $primary-lighten-3;
     }
 
     TextProgressBar .textprogressbar--readout {
-        color: $secondary-background-lighten-2;
+        color: $text-disabled;
     }
 
     TextProgressBar .textprogressbar--bars {
-        color: $success
+        color: $text-muted
     }
     """
 

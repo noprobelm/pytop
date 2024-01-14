@@ -159,39 +159,3 @@ class LoadAverage(Meter):
             self.load_avg[2],
         )
         return f"Load average: {round(self.one, 2)} {round(self.five, 2)} {round(self.fifteen, 2)}"
-
-
-class Uptime(Meter):
-    """A meter for displaying time elapsed since system boot"""
-
-    boot_time = psutil.boot_time()
-    current_time: Reactive[float] = Reactive(time)
-
-    def update_data(self) -> None:
-        self.current_time = time()
-
-    def watch_current_time(self) -> None:
-        self.update()
-
-    def render(self) -> str:
-        uptime_seconds = self.current_time - self.boot_time
-        m, s = divmod(uptime_seconds, 60)
-        h, m = divmod(m, 60)
-        return f"Uptime: {int(h):02d}:{int(m):02d}:{int(s):02d}"
-
-
-class Tasks(Meter):
-    """A meter for displaying number of tasks running"""
-
-    num_tasks: Reactive[int] = Reactive(0)
-    num_threads: Reactive[int] = Reactive(0)
-    num_kthreads: Reactive[int] = Reactive(0)
-    num_running: Reactive[int] = Reactive(0)
-
-    def compose(self) -> ComposeResult:
-        with Horizontal():
-            yield Label("Tasks: ")
-            yield Static(f"{self.num_tasks}")
-
-    # def render(self) -> str:
-    #     return f"Tasks: {self.num_tasks}, {self.num_threads} thr, {self.num_kthreads} kthr; {self.num_running} running"
