@@ -1,11 +1,12 @@
 from textual.reactive import Reactive
 from textual.widgets import DataTable
+from textual.widgets._data_table import ColumnKey
 from ..data.data import Process
 
 
 class ProcessTable(DataTable):
     processes: Reactive[dict[str, Process]] = Reactive({})
-    current_sort = ("CPU%", True)
+    current_sort: tuple[ColumnKey, bool] = (ColumnKey("CPU%"), True)
 
     def on_mount(self):
         self.cursor_type = "row"
