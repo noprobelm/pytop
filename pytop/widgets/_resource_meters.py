@@ -1,28 +1,9 @@
-from textual.app import ComposeResult
+from ._text_progress_bar import TextProgressBar
 from textual.reactive import Reactive
-from textual.widgets import Static, Label
-from textual.containers import Container, Horizontal, Vertical, Grid
-from .text_progress_bar import TextProgressBar
+from ._text_progress_bar import TextProgressBar
 import psutil
 from psutil._pslinux import svmem
 from psutil._common import sswap
-from time import time
-
-
-class Meter(Static):
-    DEFAULT_CSS = """
-    Meter {
-        height: 1;
-        width: 1fr;
-        padding-right: 1;
-    }
-    """
-
-    def on_mount(self):
-        self.update_meter = self.set_interval(1.5, self.update_data)
-
-    def update_data(self):
-        pass
 
 
 class CPUUsage(TextProgressBar):
@@ -139,23 +120,3 @@ class SwapUsage(MemoryUsage):
     def watch_swap_memory(self):
         self.progress = self.swap_memory.used
         self.update()
-
-
-class LoadAverage(Meter):
-    """A meter for displaying 1, 5, and 15 minute CPU load averages"""
-
-    load_avg: Reactive[tuple] = Reactive(psutil.getloadavg)
-
-    def update_data(self) -> None:
-        self.load_avg = psutil.getloadavg()
-
-    def watch_loadavg(self) -> None:
-        self.update()
-
-    def render(self) -> str:
-        self.one, self.five, self.fifteen = (
-            self.load_avg[0],
-            self.load_avg[1],
-            self.load_avg[2],
-        )
-        return f"Load average: {round(self.one, 2)} {round(self.five, 2)} {round(self.fifteen, 2)}"

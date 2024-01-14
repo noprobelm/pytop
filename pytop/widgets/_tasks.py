@@ -1,9 +1,9 @@
 from textual.reactive import Reactive
-from .meters import Meter
 from rich.text import Text
+from textual.widgets import Static
 
 
-class Tasks(Meter):
+class Tasks(Static):
     """A meter for displaying number of tasks running"""
 
     COMPONENT_CLASSES = {

@@ -3,9 +3,8 @@ from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Footer
 from ..widgets.process_table import ProcessTable
-from ..widgets.meters import LoadAverage, CPUUsage, RAMUsage, SwapUsage
 from textual.containers import Horizontal, Vertical
-from ..widgets import Uptime, LoadAverage, Tasks
+from ..widgets import Uptime, LoadAverage, Tasks, CPUUsage, RAMUsage, SwapUsage
 from ..data import data
 
 
