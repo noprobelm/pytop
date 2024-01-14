@@ -2,9 +2,16 @@ from textual.app import ComposeResult
 from textual.screen import Screen
 from textual.binding import Binding
 from textual.widgets import Footer
-from ..widgets.process_table import ProcessTable
 from textual.containers import Horizontal, Vertical
-from ..widgets import Uptime, LoadAverage, Tasks, CPUUsage, RAMUsage, SwapUsage
+from ..widgets import (
+    Uptime,
+    LoadAverage,
+    Tasks,
+    CPUUsage,
+    RAMUsage,
+    SwapUsage,
+    ProcessTable,
+)
 from ..data import data
 
 
