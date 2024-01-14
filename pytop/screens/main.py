@@ -6,7 +6,7 @@ from ..widgets.process_table import ProcessTable
 from ..widgets.meters import LoadAverage, CPUUsage, RAMUsage, SwapUsage
 from textual.containers import Horizontal, Vertical
 from ..widgets import Uptime, LoadAverage, Tasks
-from .. import data
+from ..data import data
 
 
 class Main(Screen):
