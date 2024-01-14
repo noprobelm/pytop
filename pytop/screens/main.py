@@ -5,8 +5,15 @@ from textual.screen import Screen
 from textual.widgets import Footer
 
 from ..data import data
-from ..widgets import (CPUUsage, LoadAverage, ProcessTable, RAMUsage,
-                       SwapUsage, Tasks, Uptime)
+from ..widgets import (
+    CPUUsage,
+    LoadAverage,
+    ProcessTable,
+    RAMUsage,
+    SwapUsage,
+    Tasks,
+    Uptime,
+)
 
 
 class Main(Screen):
