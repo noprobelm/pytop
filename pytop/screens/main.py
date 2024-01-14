@@ -1,18 +1,12 @@
 from textual.app import ComposeResult
-from textual.screen import Screen
 from textual.binding import Binding
-from textual.widgets import Footer
 from textual.containers import Horizontal, Vertical
-from ..widgets import (
-    Uptime,
-    LoadAverage,
-    Tasks,
-    CPUUsage,
-    RAMUsage,
-    SwapUsage,
-    ProcessTable,
-)
+from textual.screen import Screen
+from textual.widgets import Footer
+
 from ..data import data
+from ..widgets import (CPUUsage, LoadAverage, ProcessTable, RAMUsage,
+                       SwapUsage, Tasks, Uptime)
 
 
 class Main(Screen):

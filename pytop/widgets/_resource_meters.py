@@ -1,9 +1,9 @@
-from ._text_progress_bar import TextProgressBar
-from textual.reactive import Reactive
-from ._text_progress_bar import TextProgressBar
 import psutil
-from psutil._pslinux import svmem
 from psutil._common import sswap
+from psutil._pslinux import svmem
+from textual.reactive import Reactive
+
+from ._text_progress_bar import TextProgressBar
 
 
 class CPUUsage(TextProgressBar):

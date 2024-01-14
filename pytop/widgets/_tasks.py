@@ -1,5 +1,5 @@
-from textual.reactive import Reactive
 from rich.text import Text
+from textual.reactive import Reactive
 from textual.widgets import Static
 
 

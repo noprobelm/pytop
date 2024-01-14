@@ -1,5 +1,5 @@
-from textual.widgets import DataTable
 from textual.reactive import reactive
+from textual.widgets import DataTable
 
 
 class ProcessTable(DataTable):

@@ -1,8 +1,9 @@
 from typing import Optional
-from textual.widgets import Static
-from textual.reactive import Reactive
-from typing_extensions import Literal
+
 from rich.text import Text
+from textual.reactive import Reactive
+from textual.widgets import Static
+from typing_extensions import Literal
 
 ReadoutType = Literal["percent", "proportion"]
 
