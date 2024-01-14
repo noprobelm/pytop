@@ -1,11 +1,12 @@
-from .meters import Meter
-import psutil
-from textual.reactive import Reactive
 from time import time
+
+import psutil
 from rich.text import Text
+from textual.reactive import Reactive
+from textual.widgets import Static
 
 
-class Uptime(Meter):
+class Uptime(Static):
     """A meter for displaying time elapsed since system boot"""
 
     COMPONENT_CLASSES = {
@@ -26,11 +27,11 @@ class Uptime(Meter):
     boot_time = psutil.boot_time()
     current_time: Reactive[float] = Reactive(time)
 
-    def update_data(self) -> None:
-        self.current_time = time()
+    def on_mount(self) -> None:
+        self.set_interval(1, self.update_uptime)
 
-    def watch_current_time(self) -> None:
-        self.update()
+    def update_uptime(self) -> None:
+        self.current_time = time()
 
     def render(self) -> Text:
         uptime_seconds = self.current_time - self.boot_time

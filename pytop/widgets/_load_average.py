@@ -1,10 +1,10 @@
-from .meters import Meter
-from textual.reactive import Reactive
 import psutil
 from rich.text import Text
+from textual.reactive import Reactive
+from textual.widgets import Static
 
 
-class LoadAverage(Meter):
+class LoadAverage(Static):
     """A meter for displaying 1, 5, and 15 minute CPU load averages"""
 
     COMPONENT_CLASSES = {
@@ -33,11 +33,11 @@ class LoadAverage(Meter):
 
     load_avg: Reactive[tuple] = Reactive(psutil.getloadavg)
 
-    def update_data(self) -> None:
-        self.load_avg = psutil.getloadavg()
+    def on_mount(self):
+        self.set_interval(1.5, self.update_loadavg)
 
-    def watch_loadavg(self) -> None:
-        self.update()
+    def update_loadavg(self) -> None:
+        self.load_avg = psutil.getloadavg()
 
     def render(self) -> str:
         self.one, self.five, self.fifteen = (
