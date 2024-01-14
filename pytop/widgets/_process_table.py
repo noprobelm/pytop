@@ -1,7 +1,5 @@
-from textual.widget import Widget
-from textual.widgets import DataTable, Static
+from textual.widgets import DataTable
 from textual.reactive import reactive
-from typing_extensions import Literal
 
 
 class ProcessTable(DataTable):
