@@ -1,20 +1,21 @@
 from textual.app import ComposeResult
 from textual.binding import Binding
-from textual.containers import Vertical
 from textual.screen import Screen
-from textual.widgets import Footer
-from ..containers.meters import Meters
+from textual.containers import Vertical
+from textual.widgets import Footer, Placeholder
 from textual.reactive import Reactive
 from ..data import data
-from ..widgets import CPUUsage, ProcessTable, Tasks
+from ..widgets import CPUUsage, ProcessTable, Tasks, MeterHeader, Setup
+import psutil
 
 
 class Main(Screen):
     processes: Reactive[data.Processes] = Reactive(data.Processes())
+    cpu_percent: Reactive[dict[int, float]] = Reactive(
+        {core: percent for core, percent in enumerate(psutil.cpu_percent(percpu=True))}  # type: ignore
+    )
 
     BINDINGS = [
-        Binding(key="F1", action="help", description="Help"),
-        Binding(key="F2", action="setup", description="Setup"),
         Binding(key="F3", action="search", description="Search"),
         Binding(key="F4", action="filter", description="Filter"),
         Binding(key="F5", action="tree", description="Tree"),
@@ -25,13 +26,12 @@ class Main(Screen):
         Binding(key="F10", action="quit", description="Quit"),
     ]
 
-    STYLES = "styles/styles.tcss"
-
     def on_mount(self) -> None:
-        self.set_interval(1.5, self.update_data)
-        self.update_data()
+        self.set_interval(1.5, self.update_processes)
+        self.set_interval(1.5, self.update_cpu_percent)
+        self.update_processes()
 
-    def update_data(self) -> None:
+    def update_processes(self) -> None:
         self.processes.query_processes()
         top = self.query_one(ProcessTable)
         top.processes = self.processes.processes
@@ -42,8 +42,18 @@ class Main(Screen):
         tasks.num_kthreads = self.processes.num_kthreads
         tasks.num_running = self.processes.num_running
 
+    def update_cpu_percent(self) -> None:
+        self.cpu_percent = {
+            core: percent
+            for core, percent in enumerate(psutil.cpu_percent(percpu=True))
+        }
+
+    def watch_cpu_percent(self) -> None:
+        cpus = self.query(CPUUsage)
+        for cpu in cpus:
+            cpu.progress = self.cpu_percent[cpu.core]
+
     def compose(self) -> ComposeResult:
-        yield Vertical(
-            Meters(),
-            Vertical(ProcessTable(), Footer(), id="bot"),
-        )
+        yield MeterHeader()
+        yield ProcessTable()
+        yield Footer()

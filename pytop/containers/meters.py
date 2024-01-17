@@ -1,22 +1,8 @@
-from textual.containers import Horizontal, Vertical
+from textual.containers import Vertical, Container, Horizontal
 import psutil
 from ..widgets import *
-
-
-class MeterRow(Horizontal):
-    DEFAULT_CSS = """
-    MeterRow {
-        height: 1;
-        width: 100%;
-    }
-
-    MeterRow * {
-        height: 1;
-        width: 1fr;
-        padding-right: 1;
-        align-horizontal: right;
-    }
-    """
+from textual.widget import Widget
+from textual.widgets import Static, Label
 
 
 class MeterColumn(Vertical):
@@ -27,53 +13,48 @@ class MeterColumn(Vertical):
     """
 
 
-class Meters(Horizontal):
+class Meters(Widget):
     DEFAULT_CSS = """
 
     Meters {
+        layout: horizontal;
         height: auto;
+        width: auto;
     }
 
-    Meters .column {
+    Meters Horizontal {
         height: auto;
-        padding: 1;
+        align-horizontal: right;
+        width: auto;
+        padding: 0 1 0 1;
     }
 
-    MeterLayout #c1 {
-
+    Meters Vertical {
+        height: auto;
+        padding: 1
     }
 
-    MeterLayout #c2 {
-
-    }
-
-    MeterLayout #c3 {
-
-    }
-
-    MeterLayout #c4 {
-
-    }
 
     """
 
-    def on_mount(self):
-        num_cores = psutil.cpu_count()
-        cpu_meters = [
-            MeterRow(CPUUsage(str(n), n), CPUUsage(str(n + 1), n + 1))
-            for n in range(num_cores)[::2]
-        ]
-        c1_meters = cpu_meters[: len(cpu_meters) // 2]
-        c1_meters.extend([MeterRow(RAMUsage("Mem")), MeterRow(SwapUsage("Swp"))])
-
-        c2_meters = cpu_meters[len(cpu_meters) // 2 :]
-        c2_meters.extend(
-            [MeterRow(Tasks()), MeterRow(LoadAverage()), MeterRow(Uptime())]
-        )
-
-        self.query_one("#c1", Vertical).mount_all(c1_meters)
-        self.query_one("#c2", Vertical).mount_all(c2_meters)
-
     def compose(self):
-        yield Vertical(classes="column", id="c1")
-        yield Vertical(classes="column", id="c2")
+        num_cores = psutil.cpu_count()
+
+        with Vertical():
+            for i in range(num_cores // 2)[::2]:
+                with Horizontal():
+                    yield CPUUsage(str(i), i)
+                    yield CPUUsage(str(i + 1), i + 1)
+
+            yield Horizontal(RAMUsage("Mem", classes="meter"))
+            yield Horizontal(SwapUsage("Swp", classes="meter"))
+
+        with Vertical():
+            for i in range(num_cores // 2, num_cores)[::2]:
+                with Horizontal():
+                    yield CPUUsage(str(i), i)
+                    yield CPUUsage(str(i + 1), i + 1)
+
+            yield Horizontal(Tasks())
+            yield Horizontal(LoadAverage())
+            yield Horizontal(Uptime())

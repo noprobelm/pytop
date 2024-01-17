@@ -1,44 +1,22 @@
-.meters-column {
-    height: 100%;
-    align-vertical: middle;
-    width: 100%;
-    layout: grid;
-    grid-size: 2 4;
-    grid-gutter: 0 2;
-    padding: 0 1 0 1;
+MeterHeader {
+    height: auto;
+    margin: 1;
 }
 
-.meter-row {
-    height: 1;
-    width: 100%;
-}
-
-#meters .two-columns-50-50 {
-    layout: horizontal;
-    width: 50%;
-}
-#top {
+MeterHeader .meter-col {
     height: auto;
 }
 
-#bot {
+MeterHeader .meter-row {
+    height: 1;
 }
 
 Main {
+    overflow-y: hidden;
 }
 
-
-ProcessTable {
+Main ProcessTable {
+    height: 1fr;
+    width: auto;
     overflow-x: hidden;
-}
-
-.cpu {
-    height: 1;
-    width: 50%;
-}
-
-#col1, #col2 {
-    layout: grid;
-    height: auto;
-    padding: 1;
 }
