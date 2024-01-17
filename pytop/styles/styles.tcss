@@ -15,8 +15,18 @@ Main {
     overflow-y: hidden;
 }
 
-Main ProcessTable {
+Main .activated {
     height: 1fr;
     width: auto;
     overflow-x: hidden;
+}
+
+Main .deactivated {
+    height: 0;
+    width: 0;
+}
+
+Main Setup {
+    height: 1fr;
+    width: auto;
 }

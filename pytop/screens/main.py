@@ -1,8 +1,9 @@
+from textual import on
+
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.screen import Screen
-from textual.containers import Vertical
-from textual.widgets import Footer, Placeholder
+from textual.widgets import Footer
 from textual.reactive import Reactive
 from ..widgets import CPUUsage, ProcessTable, Tasks, MeterHeader, Setup
 from ..widgets._process_table import TaskMetrics, Process
@@ -17,6 +18,7 @@ class Main(Screen):
     )
 
     BINDINGS = [
+        Binding(key="f2", action="toggle_setup", description="Search"),
         Binding(key="F3", action="search", description="Search"),
         Binding(key="F4", action="filter", description="Filter"),
         Binding(key="F5", action="tree", description="Tree"),
@@ -29,7 +31,8 @@ class Main(Screen):
 
     def compose(self) -> ComposeResult:
         yield MeterHeader()
-        yield ProcessTable()
+        yield ProcessTable(classes="activated")
+        yield Setup(classes="deactivated")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -105,3 +108,8 @@ class Main(Screen):
         cpus = self.query(CPUUsage)
         for cpu in cpus:
             cpu.progress = self.cpu_percent[cpu.core]
+
+    def action_toggle_setup(self):
+        top = self.query_one(ProcessTable).toggle_class("activated", "deactivated")
+        self.focused = top
+        self.query_one(Setup).toggle_class("activated", "deactivated")
