@@ -26,6 +26,11 @@ class Main(Screen):
         Binding(key="F10", action="quit", description="Quit"),
     ]
 
+    def compose(self) -> ComposeResult:
+        yield MeterHeader()
+        yield ProcessTable()
+        yield Footer()
+
     def on_mount(self) -> None:
         self.set_interval(1.5, self.update_processes)
         self.set_interval(1.5, self.update_cpu_percent)
@@ -52,8 +57,3 @@ class Main(Screen):
         cpus = self.query(CPUUsage)
         for cpu in cpus:
             cpu.progress = self.cpu_percent[cpu.core]
-
-    def compose(self) -> ComposeResult:
-        yield MeterHeader()
-        yield ProcessTable()
-        yield Footer()
