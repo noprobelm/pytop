@@ -1,4 +1,6 @@
+from __future__ import annotations
 from textual.app import ComposeResult
+from textual.message import Message
 from textual.binding import Binding
 from textual.screen import Screen
 from textual.widgets import Footer
@@ -9,8 +11,6 @@ import psutil
 
 
 class Main(Screen):
-    processes: Reactive[dict[str, Process]] = Reactive({})
-    task_metrics: Reactive[TaskMetrics] = Reactive(TaskMetrics(0, 0, 0, 0))
     cpu_percent: Reactive[dict[int, float]] = Reactive(
         {core: percent for core, percent in enumerate(psutil.cpu_percent(percpu=True))}  # type: ignore
     )
@@ -27,6 +27,12 @@ class Main(Screen):
         Binding(key="F10", action="quit", description="Quit"),
     ]
 
+    class ProcessesUpdated(Message):
+        def __init__(self, processes: dict[str, Process], task_metrics: TaskMetrics):
+            self.processes = processes
+            self.task_metrics = task_metrics
+            super().__init__()
+
     def compose(self) -> ComposeResult:
         yield MeterHeader()
         yield ProcessTable(classes="activated")
@@ -38,17 +44,15 @@ class Main(Screen):
         self.cpu_query = self.set_interval(1.5, self.update_cpu_percent)
         self.update_processes()
 
-    def start_process_query(self) -> None:
-        self.process_query.resume()
+    def on_main_processes_updated(self, message: Main.ProcessesUpdated):
+        top = self.query_one(ProcessTable)
+        top.processes = message.processes
 
-    def stop_process_query(self) -> None:
-        self.process_query.pause()
-
-    def start_cpu_query(self) -> None:
-        self.cpu_query.resume()
-
-    def stop_cpu_query(self) -> None:
-        self.cpu_query.pause()
+        tasks = self.query_one(Tasks)
+        tasks.num_tasks = message.task_metrics.num_tasks
+        tasks.num_threads = message.task_metrics.num_threads
+        tasks.num_kthreads = message.task_metrics.num_kthreads
+        tasks.num_running = message.task_metrics.num_running
 
     def update_processes(self) -> None:
         processes = {}
@@ -80,21 +84,10 @@ class Main(Screen):
 
                 processes[str(process.pid)] = process
 
-        self.task_metrics = TaskMetrics(
-            num_tasks, num_threads, num_kthreads, num_running
-        )
+        task_metrics = TaskMetrics(num_tasks, num_threads, num_kthreads, num_running)
 
-        self.processes = processes
-
-    def watch_processes(self) -> None:
-        top = self.query_one(ProcessTable)
-        top.processes = self.processes
-
-        tasks = self.query_one(Tasks)
-        tasks.num_tasks = self.task_metrics.num_tasks
-        tasks.num_threads = self.task_metrics.num_threads
-        tasks.num_kthreads = self.task_metrics.num_kthreads
-        tasks.num_running = self.task_metrics.num_running
+        processes = processes
+        self.post_message(self.ProcessesUpdated(processes, task_metrics))
 
     def update_cpu_percent(self) -> None:
         self.cpu_percent = {
