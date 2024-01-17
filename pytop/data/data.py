@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import os
+from dataclasses import dataclass
 from typing import List, Optional
 
 import psutil
 from psutil._common import pcputimes
 from psutil._pslinux import pmem
+from rich.text import Text
 
 
 class Process:
@@ -67,26 +70,27 @@ class Processes:
         )
         process_data = psutil.process_iter()
         for data in process_data:
-            process = Process(
-                data.pid,
-                data.ppid(),
-                data.name(),
-                data.username(),
-                data.nice(),
-                data.memory_info(),
-                data.status(),
-                data.cpu_percent(),
-                data.memory_percent(),
-                data.cpu_times(),
-                data.num_threads(),
-                data.cmdline(),
-            )
-            if process.ppid != 2:
-                self.num_tasks += 1
-            if not process.cmdline:
-                self.num_kthreads += 1
-            if process.status == psutil.STATUS_RUNNING:
-                self.num_running += 1
-            self.num_threads += process.num_threads
+            with data.oneshot():
+                process = Process(
+                    data.pid,
+                    data.ppid(),
+                    data.name(),
+                    data.username(),
+                    data.nice(),
+                    data.memory_info(),
+                    data.status(),
+                    data.cpu_percent(),
+                    data.memory_percent(),
+                    data.cpu_times(),
+                    data.num_threads(),
+                    data.cmdline(),
+                )
+                if process.ppid != 2:
+                    self.num_tasks += 1
+                if not process.cmdline:
+                    self.num_kthreads += 1
+                if process.status == psutil.STATUS_RUNNING:
+                    self.num_running += 1
+                self.num_threads += process.num_threads
 
-            self.processes[str(process.pid)] = process
+                self.processes[str(process.pid)] = process
