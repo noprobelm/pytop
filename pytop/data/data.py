@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import os
-from dataclasses import dataclass
 from typing import List, Optional
 
 import psutil
 from psutil._common import pcputimes
 from psutil._pslinux import pmem
-from rich.text import Text
 
 
 class Process:
