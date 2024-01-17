@@ -33,9 +33,21 @@ class Main(Screen):
         yield Footer()
 
     def on_mount(self) -> None:
-        self.set_interval(1.5, self.update_processes)
-        self.set_interval(1.5, self.update_cpu_percent)
+        self.process_query = self.set_interval(1.5, self.update_processes)
+        self.cpu_query = self.set_interval(1.5, self.update_cpu_percent)
         self.update_processes()
+
+    def start_process_query(self) -> None:
+        self.process_query.resume()
+
+    def stop_process_query(self) -> None:
+        self.process_query.pause()
+
+    def start_cpu_query(self) -> None:
+        self.cpu_query.resume()
+
+    def stop_cpu_query(self) -> None:
+        self.cpu_query.pause()
 
     def update_processes(self) -> None:
         processes = {}
