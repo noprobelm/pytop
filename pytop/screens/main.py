@@ -4,13 +4,14 @@ from textual.screen import Screen
 from textual.containers import Vertical
 from textual.widgets import Footer, Placeholder
 from textual.reactive import Reactive
-from ..data import data
 from ..widgets import CPUUsage, ProcessTable, Tasks, MeterHeader, Setup
+from ..widgets._process_table import TaskMetrics, Process
 import psutil
 
 
 class Main(Screen):
-    processes: Reactive[data.Processes] = Reactive(data.Processes())
+    processes: Reactive[dict[str, Process]] = Reactive({})
+    task_metrics: Reactive[TaskMetrics] = Reactive(TaskMetrics(0, 0, 0, 0))
     cpu_percent: Reactive[dict[int, float]] = Reactive(
         {core: percent for core, percent in enumerate(psutil.cpu_percent(percpu=True))}  # type: ignore
     )
@@ -37,20 +38,55 @@ class Main(Screen):
         self.update_processes()
 
     def update_processes(self) -> None:
-        self.processes.query_processes()
+        processes = {}
+        num_tasks, num_threads, num_kthreads, num_running = 0, 0, 0, 0
+        process_query = psutil.process_iter()
+        for p in process_query:
+            with p.oneshot():
+                process = Process(
+                    p.pid,
+                    p.ppid(),
+                    p.name(),
+                    p.username(),
+                    p.nice(),
+                    p.memory_info(),
+                    p.status(),
+                    p.cpu_percent(),
+                    p.memory_percent(),
+                    p.cpu_times(),
+                    p.num_threads(),
+                    p.cmdline(),
+                )
+                if p.ppid != 2:
+                    num_tasks += 1
+                if not process.cmdline:
+                    num_kthreads += 1
+                if process.status == psutil.STATUS_RUNNING:
+                    num_running += 1
+                num_threads += process.num_threads
+
+                processes[str(process.pid)] = process
+
+        self.task_metrics = TaskMetrics(
+            num_tasks, num_threads, num_kthreads, num_running
+        )
+
+        self.processes = processes
+
+    def watch_processes(self) -> None:
         top = self.query_one(ProcessTable)
-        top.processes = self.processes.processes
+        top.processes = self.processes
 
         tasks = self.query_one(Tasks)
-        tasks.num_tasks = self.processes.num_tasks
-        tasks.num_threads = self.processes.num_threads
-        tasks.num_kthreads = self.processes.num_kthreads
-        tasks.num_running = self.processes.num_running
+        tasks.num_tasks = self.task_metrics.num_tasks
+        tasks.num_threads = self.task_metrics.num_threads
+        tasks.num_kthreads = self.task_metrics.num_kthreads
+        tasks.num_running = self.task_metrics.num_running
 
     def update_cpu_percent(self) -> None:
         self.cpu_percent = {
             core: percent
-            for core, percent in enumerate(psutil.cpu_percent(percpu=True))
+            for core, percent in enumerate(psutil.cpu_percent(percpu=True))  # type: ignore
         }
 
     def watch_cpu_percent(self) -> None:

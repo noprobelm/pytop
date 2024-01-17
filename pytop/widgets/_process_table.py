@@ -1,11 +1,15 @@
 from textual.reactive import Reactive
 from textual.widgets import DataTable
 from textual.widgets._data_table import ColumnKey
-from ..data.data import Process
 from dataclasses import dataclass
 from rich.text import Text
 import psutil
 import os
+from collections import namedtuple
+from psutil._pslinux import pmem
+from psutil._common import pcputimes
+from typing import Optional, List
+
 
 STATUS = {
     psutil.STATUS_RUNNING: "R",
@@ -21,6 +25,49 @@ STATUS = {
 }
 
 USERNAME = os.getlogin()
+
+TaskMetrics = namedtuple(
+    "TaskMetrics", ["num_tasks", "num_threads", "num_kthreads", "num_running"]
+)
+
+
+class Process:
+    def __init__(
+        self,
+        pid: int,
+        ppid: int,
+        name: str,
+        username: str,
+        nice: int,
+        memory_info: pmem,
+        status: str,
+        cpu_percent: float,
+        memory_percent: float,
+        cpu_times: pcputimes,
+        num_threads: int,
+        cmdline: Optional[List[str]] = None,
+    ):
+        self.pid = pid
+        self.ppid = ppid
+        self.name = name
+        self.username = username
+        self.nice = nice
+        self.pri = nice
+        self.virt = memory_info.vms
+        self.res = memory_info.rss
+        self.shr = memory_info.shared
+        self.status = status
+        self.cpu_percent = cpu_percent
+        self.memory_percent = memory_percent
+
+        self.cpu_times = cpu_times
+        self.num_threads = num_threads
+        self.name = name
+
+        if cmdline is None:
+            self.cmdline = self.name
+        else:
+            self.cmdline = "".join(cmdline)
 
 
 @dataclass(order=True, eq=True)
