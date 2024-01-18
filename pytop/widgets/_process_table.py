@@ -8,6 +8,7 @@ import os
 from psutil._pslinux import pmem
 from psutil._common import pcputimes
 from typing import Optional, List
+from dataclasses import dataclass
 
 
 STATUS_MAPPER = {
@@ -26,7 +27,6 @@ STATUS_MAPPER = {
 USERNAME = os.getlogin()
 
 
-@dataclass
 class Process:
     def __init__(
         self,
