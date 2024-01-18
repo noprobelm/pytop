@@ -174,7 +174,9 @@ class CPUTimes:
 
 class ProcessTable(DataTable):
     processes: Reactive[list[Process]] = Reactive([])
-    current_sort: tuple[ColumnKey, bool] = (ColumnKey("CPU%"), True)
+    _current_sort: Reactive[tuple[ColumnKey, bool]] = Reactive(
+        (ColumnKey("CPU%"), True)
+    )
 
     def on_mount(self):
         self.cursor_type = "row"
@@ -195,7 +197,7 @@ class ProcessTable(DataTable):
             self.add_column(label, key=label)
 
         self.fixed_rows = 0
-        self.sort(self.current_sort[0], reverse=self.current_sort[1])
+        self.sort(self._current_sort[0], reverse=self._current_sort[1])
 
     def watch_processes(self):
         old_keys = set(row.value for row in self.rows.copy())
@@ -235,11 +237,11 @@ class ProcessTable(DataTable):
             assert isinstance(row_key, str)
             self.remove_row(row_key)
 
-        self.sort(self.current_sort[0], reverse=self.current_sort[1])
+        self.sort(self._current_sort[0], reverse=self._current_sort[1])
 
     def on_data_table_header_selected(self, selected: DataTable.HeaderSelected):
-        if self.current_sort[0] == selected.column_key:
-            self.current_sort = (selected.column_key, not self.current_sort[1])
+        if self._current_sort[0] == selected.column_key:
+            self._current_sort = (selected.column_key, not self._current_sort[1])
         else:
-            self.current_sort = (selected.column_key, True)
-        self.sort(self.current_sort[0], reverse=self.current_sort[1])
+            self._current_sort = (selected.column_key, True)
+        self.sort(self._current_sort[0], reverse=self._current_sort[1])
