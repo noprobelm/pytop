@@ -24,13 +24,13 @@ class Main(Screen):
     ]
 
     class ProcessesUpdated(Message):
-        def __init__(self, processes: list[Process], task_metrics: TaskMetrics):
+        def __init__(self, processes: list[Process], task_metrics: TaskMetrics) -> None:
             self.processes = processes
             self.task_metrics = task_metrics
             super().__init__()
 
     class CpuPercentUpdated(Message):
-        def __init__(self, cpu_percent: dict[int, float]):
+        def __init__(self, cpu_percent: dict[int, float]) -> None:
             self.cpu_percent = cpu_percent
             super().__init__()
 
@@ -47,7 +47,7 @@ class Main(Screen):
         self._query_system_processes()
 
     @on(ProcessesUpdated)
-    def update_process_widgets(self, message: ProcessesUpdated):
+    def update_process_widgets(self, message: ProcessesUpdated) -> None:
         top = self.query_one(ProcessTable)
         top.processes = message.processes
 
@@ -59,7 +59,7 @@ class Main(Screen):
             task.num_running = message.task_metrics.num_running
 
     @on(CpuPercentUpdated)
-    def update_cpu_meters(self, message: CpuPercentUpdated):
+    def update_cpu_meters(self, message: CpuPercentUpdated) -> None:
         cpus = self.query(CPUUsage)
         for cpu in cpus:
             cpu.progress = message.cpu_percent[cpu.core]
@@ -105,7 +105,7 @@ class Main(Screen):
         }
         self.post_message(self.CpuPercentUpdated(cpu_percent))
 
-    def action_toggle_setup(self):
+    def action_toggle_setup(self) -> None:
         top = self.query_one(ProcessTable).toggle_class("activated", "deactivated")
         self.focused = top
         self.query_one(Setup).toggle_class("activated", "deactivated")
