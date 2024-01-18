@@ -29,7 +29,7 @@ class Main(Screen):
             self.task_metrics = task_metrics
             super().__init__()
 
-    class CPUPercentUpdated(Message):
+    class CpuPercentUpdated(Message):
         def __init__(self, cpu_percent: dict[int, float]):
             self.cpu_percent = cpu_percent
             super().__init__()
@@ -58,8 +58,8 @@ class Main(Screen):
             task.num_kthreads = message.task_metrics.num_kthreads
             task.num_running = message.task_metrics.num_running
 
-    @on(CPUPercentUpdated)
-    def update_cpu_meters(self, message: CPUPercentUpdated):
+    @on(CpuPercentUpdated)
+    def update_cpu_meters(self, message: CpuPercentUpdated):
         cpus = self.query(CPUUsage)
         for cpu in cpus:
             cpu.progress = message.cpu_percent[cpu.core]
@@ -103,7 +103,7 @@ class Main(Screen):
             core: percent
             for core, percent in enumerate(psutil.cpu_percent(percpu=True))  # type: ignore
         }
-        self.post_message(self.CPUPercentUpdated(cpu_percent))
+        self.post_message(self.CpuPercentUpdated(cpu_percent))
 
     def action_toggle_setup(self):
         top = self.query_one(ProcessTable).toggle_class("activated", "deactivated")
