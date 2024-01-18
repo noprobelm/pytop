@@ -11,6 +11,10 @@ MeterHeader .meter-row {
     height: 1;
 }
 
+MeterHeader .meter {
+    width: 1fr;
+}
+
 Main {
     overflow-y: hidden;
 }
