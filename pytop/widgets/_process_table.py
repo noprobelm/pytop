@@ -59,10 +59,10 @@ class Process:
         self.cpu_times = cpu_times
         self.num_threads = num_threads
 
-        if cmdline is None:
-            self.cmdline = self.name
-        else:
+        if cmdline:
             self.cmdline = "".join(cmdline)
+        else:
+            self.cmdline = self.name
 
 
 @dataclass(order=True, eq=True)
