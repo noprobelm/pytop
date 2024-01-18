@@ -5,8 +5,6 @@ from textual.reactive import Reactive
 class CPUUsage(TextProgressBar):
     """A meter for displaying CPU usage (per core) as a text progress meter"""
 
-    progress: Reactive[float] = Reactive(0.0)
-
     DEFAULT_CSS = """
     CPUUsage {
         height: 1;

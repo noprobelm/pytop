@@ -41,10 +41,9 @@ class Main(Screen):
         yield Footer()
 
     def on_mount(self) -> None:
+        self._query_system_processes()
         self.update_processes = self.set_interval(1.5, self._query_system_processes)
         self.update_cpu_percent = self.set_interval(1.5, self._measure_cpu_percent)
-        self._measure_cpu_percent()
-        self._query_system_processes()
 
     @on(ProcessesUpdated)
     def update_process_widgets(self, message: ProcessesUpdated) -> None:
