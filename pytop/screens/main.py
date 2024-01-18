@@ -5,7 +5,8 @@ from textual.binding import Binding
 from textual.screen import Screen
 from textual.widgets import Footer
 from ..widgets import CPUUsage, ProcessTable, Tasks, MeterHeader, Setup
-from ..widgets._process_table import TaskMetrics, Process
+from ..widgets._process_table import Process
+from ..widgets._tasks import TaskMetrics
 import psutil
 
 
@@ -23,7 +24,7 @@ class Main(Screen):
     ]
 
     class ProcessesUpdated(Message):
-        def __init__(self, processes: dict[str, Process], task_metrics: TaskMetrics):
+        def __init__(self, processes: list[Process], task_metrics: TaskMetrics):
             self.processes = processes
             self.task_metrics = task_metrics
             super().__init__()
@@ -64,7 +65,7 @@ class Main(Screen):
             cpu.progress = message.cpu_percent[cpu.core]
 
     def _query_system_processes(self) -> None:
-        processes = {}
+        processes = []
         num_tasks, num_threads, num_kthreads, num_running = 0, 0, 0, 0
         process_query = psutil.process_iter()
         for p in process_query:
@@ -91,11 +92,10 @@ class Main(Screen):
                     num_running += 1
                 num_threads += process.num_threads
 
-                processes[str(process.pid)] = process
+                processes.append(process)
 
         task_metrics = TaskMetrics(num_tasks, num_threads, num_kthreads, num_running)
 
-        processes = processes
         self.post_message(self.ProcessesUpdated(processes, task_metrics))
 
     def _measure_cpu_percent(self) -> None:

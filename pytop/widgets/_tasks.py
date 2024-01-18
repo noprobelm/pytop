@@ -1,6 +1,11 @@
 from rich.text import Text
 from textual.widgets import Static
 from textual.reactive import Reactive
+from collections import namedtuple
+
+TaskMetrics = namedtuple(
+    "TaskMetrics", ["num_tasks", "num_threads", "num_kthreads", "num_running"]
+)
 
 
 class Tasks(Static):
