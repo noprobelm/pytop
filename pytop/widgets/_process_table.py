@@ -8,10 +8,9 @@ import os
 from psutil._pslinux import pmem
 from psutil._common import pcputimes
 from typing import Optional, List
-from collections import namedtuple
 
 
-STATUS = {
+STATUS_MAPPER = {
     psutil.STATUS_RUNNING: "R",
     psutil.STATUS_SLEEPING: "S",
     psutil.STATUS_DISK_SLEEP: "D",
@@ -137,7 +136,7 @@ class Status:
     status: str
 
     def __rich__(self) -> Text:
-        status = STATUS[self.status]
+        status = STATUS_MAPPER[self.status]
         if status == "R":
             return Text(status, style="bright_green")
         else:
