@@ -3,7 +3,7 @@ MeterHeader {
     margin: 1;
 }
 
-MeterHeader .meter-col {
+#c1, #c2, #c3, #c4 {
     height: auto;
 }
 

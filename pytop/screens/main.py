@@ -48,11 +48,12 @@ class Main(Screen):
         top = self.query_one(ProcessTable)
         top.processes = message.processes
 
-        tasks = self.query_one(Tasks)
-        tasks.num_tasks = message.task_metrics.num_tasks
-        tasks.num_threads = message.task_metrics.num_threads
-        tasks.num_kthreads = message.task_metrics.num_kthreads
-        tasks.num_running = message.task_metrics.num_running
+        tasks = self.query(Tasks)
+        for task in tasks:
+            task.num_tasks = message.task_metrics.num_tasks
+            task.num_threads = message.task_metrics.num_threads
+            task.num_kthreads = message.task_metrics.num_kthreads
+            task.num_running = message.task_metrics.num_running
 
     def update_processes(self) -> None:
         processes = {}

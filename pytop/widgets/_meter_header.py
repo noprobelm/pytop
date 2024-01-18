@@ -7,7 +7,7 @@ class MeterHeader(Horizontal):
     def compose(self):
         num_cores = psutil.cpu_count()
 
-        with Vertical(classes="meter-col"):
+        with Vertical(classes="meter-col", id="c1"):
             for i in range(num_cores // 2)[::2]:
                 with Horizontal(classes="meter-row"):
                     yield CPUUsage(str(i), i, classes="meter")
@@ -16,7 +16,7 @@ class MeterHeader(Horizontal):
             yield Horizontal(RAMUsage("Mem"), classes="meter-row")
             yield Horizontal(SwapUsage("Swp"), classes="meter-row")
 
-        with Vertical(classes="meter-col"):
+        with Vertical(classes="meter-col", id="c2"):
             for i in range(num_cores // 2, num_cores)[::2]:
                 with Horizontal(classes="meter-row"):
                     yield CPUUsage(str(i), i, classes="meter")
