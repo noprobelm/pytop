@@ -26,6 +26,7 @@ STATUS_MAPPER = {
 USERNAME = os.getlogin()
 
 
+@dataclass
 class Process:
     def __init__(
         self,
@@ -57,7 +58,6 @@ class Process:
 
         self.cpu_times = cpu_times
         self.num_threads = num_threads
-        self.name = name
 
         if cmdline is None:
             self.cmdline = self.name
@@ -243,8 +243,3 @@ class ProcessTable(DataTable):
         else:
             self.current_sort = (selected.column_key, True)
         self.sort(self.current_sort[0], reverse=self.current_sort[1])
-
-
-from rich.text import Text
-from textual.reactive import Reactive
-from textual.widgets import Static
