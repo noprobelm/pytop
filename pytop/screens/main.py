@@ -1,20 +1,15 @@
-from __future__ import annotations
+from textual import on
 from textual.app import ComposeResult
 from textual.message import Message
 from textual.binding import Binding
 from textual.screen import Screen
 from textual.widgets import Footer
-from textual.reactive import Reactive
 from ..widgets import CPUUsage, ProcessTable, Tasks, MeterHeader, Setup
 from ..widgets._process_table import TaskMetrics, Process
 import psutil
 
 
 class Main(Screen):
-    cpu_percent: Reactive[dict[int, float]] = Reactive(
-        {core: percent for core, percent in enumerate(psutil.cpu_percent(percpu=True))}  # type: ignore
-    )
-
     BINDINGS = [
         Binding(key="f2", action="toggle_setup", description="Search"),
         Binding(key="F3", action="search", description="Search"),
@@ -33,6 +28,11 @@ class Main(Screen):
             self.task_metrics = task_metrics
             super().__init__()
 
+    class CPUPercentUpdated(Message):
+        def __init__(self, cpu_percent: dict[int, float]):
+            self.cpu_percent = cpu_percent
+            super().__init__()
+
     def compose(self) -> ComposeResult:
         yield MeterHeader()
         yield ProcessTable(classes="activated")
@@ -40,11 +40,13 @@ class Main(Screen):
         yield Footer()
 
     def on_mount(self) -> None:
-        self.process_query = self.set_interval(1.5, self.update_processes)
-        self.cpu_query = self.set_interval(1.5, self.update_cpu_percent)
-        self.update_processes()
+        self.update_processes = self.set_interval(1.5, self._query_system_processes)
+        self.update_cpu_percent = self.set_interval(1.5, self._measure_cpu_percent)
+        self._measure_cpu_percent()
+        self._query_system_processes()
 
-    def on_main_processes_updated(self, message: Main.ProcessesUpdated):
+    @on(ProcessesUpdated)
+    def update_process_widgets(self, message: ProcessesUpdated):
         top = self.query_one(ProcessTable)
         top.processes = message.processes
 
@@ -55,7 +57,13 @@ class Main(Screen):
             task.num_kthreads = message.task_metrics.num_kthreads
             task.num_running = message.task_metrics.num_running
 
-    def update_processes(self) -> None:
+    @on(CPUPercentUpdated)
+    def update_cpu_meters(self, message: CPUPercentUpdated):
+        cpus = self.query(CPUUsage)
+        for cpu in cpus:
+            cpu.progress = message.cpu_percent[cpu.core]
+
+    def _query_system_processes(self) -> None:
         processes = {}
         num_tasks, num_threads, num_kthreads, num_running = 0, 0, 0, 0
         process_query = psutil.process_iter()
@@ -90,16 +98,12 @@ class Main(Screen):
         processes = processes
         self.post_message(self.ProcessesUpdated(processes, task_metrics))
 
-    def update_cpu_percent(self) -> None:
-        self.cpu_percent = {
+    def _measure_cpu_percent(self) -> None:
+        cpu_percent: dict[int, float] = {
             core: percent
             for core, percent in enumerate(psutil.cpu_percent(percpu=True))  # type: ignore
         }
-
-    def watch_cpu_percent(self) -> None:
-        cpus = self.query(CPUUsage)
-        for cpu in cpus:
-            cpu.progress = self.cpu_percent[cpu.core]
+        self.post_message(self.CPUPercentUpdated(cpu_percent))
 
     def action_toggle_setup(self):
         top = self.query_one(ProcessTable).toggle_class("activated", "deactivated")
