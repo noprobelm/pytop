@@ -5,10 +5,10 @@ from dataclasses import dataclass
 from rich.text import Text
 import psutil
 import os
-from collections import namedtuple
 from psutil._pslinux import pmem
 from psutil._common import pcputimes
 from typing import Optional, List
+from collections import namedtuple
 
 
 STATUS = {
@@ -25,10 +25,6 @@ STATUS = {
 }
 
 USERNAME = os.getlogin()
-
-TaskMetrics = namedtuple(
-    "TaskMetrics", ["num_tasks", "num_threads", "num_kthreads", "num_running"]
-)
 
 
 class Process:
@@ -178,7 +174,7 @@ class CPUTimes:
 
 
 class ProcessTable(DataTable):
-    processes: Reactive[dict[str, Process]] = Reactive({})
+    processes: Reactive[list[Process]] = Reactive([])
     current_sort: tuple[ColumnKey, bool] = (ColumnKey("CPU%"), True)
 
     def on_mount(self):
@@ -203,45 +199,43 @@ class ProcessTable(DataTable):
         self.sort(self.current_sort[0], reverse=self.current_sort[1])
 
     def watch_processes(self):
-        queued = set(self.processes.keys())
-        rows = self.rows.copy()
-        for row_key in rows:
-            pid = row_key.value
-            assert pid is not None
+        old_keys = set(row.value for row in self.rows.copy())
+        new_keys = set()
+        for p in self.processes:
+            row_key = str(p.pid)
+            new_keys.add(row_key)
+            if row_key in old_keys:
+                self.update_cell(row_key, "PRI", Nice(p.nice))
+                self.update_cell(row_key, "NI", Nice(p.nice))
+                self.update_cell(row_key, "VIRT", Memory(p.virt))
+                self.update_cell(row_key, "RES", Memory(p.res))
+                self.update_cell(row_key, "SHR", Memory(p.shr))
+                self.update_cell(row_key, "S", Status(p.status))
+                self.update_cell(row_key, "CPU%", Percent(p.cpu_percent))
+                self.update_cell(row_key, "MEM%", Percent(p.memory_percent))
+                self.update_cell(row_key, "Command", p.cmdline)
+            else:
+                self.add_row(
+                    PID(p.pid),
+                    Username(p.username),
+                    Nice(p.nice),
+                    Nice(p.nice),
+                    Memory(p.virt),
+                    Memory(p.res),
+                    Memory(p.shr),
+                    Status(p.status),
+                    Percent(p.cpu_percent),
+                    Percent(p.memory_percent),
+                    CPUTimes(p.cpu_times.user, p.cpu_times.system),
+                    p.cmdline,
+                    key=row_key,
+                )
 
-            if pid not in self.processes.keys():
-                self.remove_row(pid)
-                continue
-            p = self.processes[pid]
-            self.update_cell(pid, "PRI", Nice(p.nice))
-            self.update_cell(pid, "NI", Nice(p.nice))
-            self.update_cell(pid, "VIRT", Memory(p.virt))
-            self.update_cell(pid, "RES", Memory(p.res))
-            self.update_cell(pid, "SHR", Memory(p.shr))
-            self.update_cell(pid, "S", Status(p.status))
-            self.update_cell(pid, "CPU%", Percent(p.cpu_percent))
-            self.update_cell(pid, "MEM%", Percent(p.memory_percent))
-            self.update_cell(pid, "Command", p.cmdline)
+        diff = old_keys.difference(new_keys)
+        for row_key in diff:
+            assert isinstance(row_key, str)
+            self.remove_row(row_key)
 
-            queued.remove(pid)
-
-        for pid in queued:
-            p = self.processes[pid]
-            self.add_row(
-                PID(p.pid),
-                Username(p.username),
-                Nice(p.nice),
-                Nice(p.nice),
-                Memory(p.virt),
-                Memory(p.res),
-                Memory(p.shr),
-                Status(p.status),
-                Percent(p.cpu_percent),
-                Percent(p.memory_percent),
-                CPUTimes(p.cpu_times.user, p.cpu_times.system),
-                p.cmdline,
-                key=pid,
-            )
         self.sort(self.current_sort[0], reverse=self.current_sort[1])
 
     def on_data_table_header_selected(self, selected: DataTable.HeaderSelected):
