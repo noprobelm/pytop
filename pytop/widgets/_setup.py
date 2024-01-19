@@ -60,27 +60,6 @@ HEADER_LAYOUT_OPTIONS = (
 
 
 class Setup(Widget):
-    DEFAULT_CSS = """
-    Setup Horizontal {
-        content-align: left top;
-    }
-    Setup #categories {
-        height: 100%;
-        padding: 0;
-        width: auto;
-    }
-
-    Setup SelectionList {
-        padding: 0;
-        box-sizing: content-box;
-
-    }
-
-    Setup RadioSet RadioButton {
-    }
-
-    """
-
     def on_mount(self):
         categories = self.query_one("#categories", RadioSet)
         categories.border_title = "Categories: "

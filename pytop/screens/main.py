@@ -4,6 +4,7 @@ from textual.message import Message
 from textual.binding import Binding
 from textual.screen import Screen
 from textual.widgets import Footer
+from textual.containers import Container
 from ..widgets import CPUUsage, ProcessTable, Tasks, MeterHeader, Setup
 from ..widgets._process_table import Process
 from ..widgets._tasks import TaskMetrics
@@ -36,8 +37,9 @@ class Main(Screen):
 
     def compose(self) -> ComposeResult:
         yield MeterHeader()
-        yield ProcessTable(classes="activated")
-        yield Setup(classes="deactivated")
+        with Container(id="information-area"):
+            yield ProcessTable(classes="activated")
+            yield Setup(classes="deactivated")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -106,5 +108,4 @@ class Main(Screen):
 
     def action_toggle_setup(self) -> None:
         top = self.query_one(ProcessTable).toggle_class("activated", "deactivated")
-        self.focused = top
         self.query_one(Setup).toggle_class("activated", "deactivated")

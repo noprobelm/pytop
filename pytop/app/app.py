@@ -1,7 +1,7 @@
 from textual.app import App
 from textual.binding import Binding
 
-from ..screens import Main, Setup, Help
+from ..screens import Main, Help
 
 
 class Pytop(App):

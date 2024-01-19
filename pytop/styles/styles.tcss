@@ -16,21 +16,29 @@ MeterHeader .meter {
 }
 
 Main {
-    overflow-y: hidden;
 }
 
-Main .activated {
+
+Main ProcessTable {
     height: 1fr;
-    width: 100%;
     overflow-x: hidden;
 }
 
-Main .deactivated {
-    height: 0;
-    width: 0;
+Main #information-area {
+    width: 100%;
+    layers: below above;
 }
+
 
 Main Setup {
     height: 1fr;
-    width: auto;
 }
+
+Main .activated {
+    layer: above;
+}
+
+Main .deactivated {
+    layer: below;
+}
+
