@@ -38,8 +38,8 @@ class Main(Screen):
     def compose(self) -> ComposeResult:
         yield MeterHeader()
         with Container(id="information-area"):
-            yield ProcessTable(classes="activated")
-            yield Setup(classes="deactivated")
+            yield ProcessTable(classes="enabled")
+            yield Setup(classes="disabled")
         yield Footer()
 
     def on_mount(self) -> None:
@@ -107,5 +107,10 @@ class Main(Screen):
         self.post_message(self.CpuPercentUpdated(cpu_percent))
 
     def action_toggle_setup(self) -> None:
-        top = self.query_one(ProcessTable).toggle_class("activated", "deactivated")
-        self.query_one(Setup).toggle_class("activated", "deactivated")
+        top = self.query_one(ProcessTable).toggle_class("enabled", "disabled")
+        setup = self.query_one(Setup).toggle_class("enabled", "disabled")
+
+        if top.display is True:
+            top.focus()
+        else:
+            setup.focus()

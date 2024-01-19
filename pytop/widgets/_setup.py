@@ -74,5 +74,8 @@ class Setup(Widget):
                 yield RadioButton("Colors")
 
             with Vertical():
-                yield SelectionList(*SCREEN_DISPLAY_OPTIONS)
-                yield SelectionList(*SCREEN_GLOBAL_OPTIONS)
+                yield SelectionList(*SCREEN_DISPLAY_OPTIONS, classes="display-options")
+                yield SelectionList(*SCREEN_GLOBAL_OPTIONS, classes="global_options")
+
+    def on_show(self):
+        self.query_one(RadioSet).focus()

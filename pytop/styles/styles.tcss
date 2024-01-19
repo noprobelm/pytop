@@ -26,7 +26,6 @@ Main ProcessTable {
 
 Main #information-area {
     width: 100%;
-    layers: below above;
 }
 
 
@@ -34,11 +33,12 @@ Main Setup {
     height: 1fr;
 }
 
-Main .activated {
-    layer: above;
+Main .enabled {
+    display: block;
+    visibility: visible;
 }
 
-Main .deactivated {
-    layer: below;
+Main .disabled {
+    display: none;
+    visibility: hidden;
 }
-
