@@ -83,11 +83,11 @@ class Main(Screen):
                     p.num_threads(),
                     p.cmdline(),
                 )
-                if p.ppid != 2:
+                if p.ppid() != 2:
                     num_tasks += 1
-                if not process.cmdline:
+                if not p.cmdline():
                     num_kthreads += 1
-                if process.status == psutil.STATUS_RUNNING:
+                if p.status() == psutil.STATUS_RUNNING:
                     num_running += 1
                 num_threads += process.num_threads
 
