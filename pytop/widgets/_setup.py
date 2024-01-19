@@ -3,9 +3,9 @@ from textual.widgets import RadioSet, RadioButton, SelectionList
 from textual.containers import Horizontal, Vertical
 
 SCREEN_DISPLAY_OPTIONS = (
-    ("Tree View", 0),
-    ("- Tree view is always sorted by PID", 1),
-    ("Tree view is collapsed by default", 2),
+    ("Process Table - Tree View", 0),
+    (" - Tree view is always sorted by PID", 1),
+    (" - Tree view is collapsed by default", 2),
 )
 
 SCREEN_GLOBAL_OPTIONS = (
@@ -21,8 +21,8 @@ SCREEN_GLOBAL_OPTIONS = (
     ("Highlight out-dated/removed programs (red) / libraries (yellow)", 8),
     ("Shadow distribution path prefixes", 9),
     ("Merge exe, comm, and cmdline in Command", 10),
-    ("- Try to find comm in cmdline (when Command is merged)", 11),
-    ("- Try to strip exe from cmdline (when Command is merged)", 12),
+    (" - Try to find comm in cmdline (when Command is merged)", 11),
+    (" - Try to strip exe from cmdline (when Command is merged)", 12),
     ("Highlight large numbers in memory counters", 13),
     ("Leave a margin around header", 14),
     ("Detailed CPU time (System/IO-Wait/Hard-IRQ/Soft-IRQ/Steal/Guest)", 15),
@@ -32,11 +32,11 @@ SCREEN_GLOBAL_OPTIONS = (
     ("Also show CPU percentage numerically", 19),
     ("Also show CPU frequency", 20),
     ("Also show CPU temperature (requires libsensors)", 21),
-    ("- Show temperature in Fahrenheit", 22),
+    (" - Show temperature in Fahrenheit", 22),
     ("Enable the mouse", 23),
     ("Update interval (in seconds)", 24),
     ("Highlight new and old processes", 25),
-    ("- Highlight time (in seconds)", 26),
+    (" - Highlight time (in seconds)", 26),
     (
         "Hide main function bar (0 - off, 1 - on ESC until next input, 2 - permanently)",
         27,
@@ -61,8 +61,9 @@ HEADER_LAYOUT_OPTIONS = (
 
 class Setup(Widget):
     def on_mount(self):
-        categories = self.query_one("#categories", RadioSet)
-        categories.border_title = "Categories: "
+        self.query_one("#categories", RadioSet).border_title = "Categories"
+        self.query_one("#display-options").border_title = "Display Options"
+        self.query_one("#global-options").border_title = "Global Options"
 
     def compose(self):
         with Horizontal():
@@ -74,8 +75,8 @@ class Setup(Widget):
                 yield RadioButton("Colors")
 
             with Vertical():
-                yield SelectionList(*SCREEN_DISPLAY_OPTIONS, classes="display-options")
-                yield SelectionList(*SCREEN_GLOBAL_OPTIONS, classes="global_options")
+                yield SelectionList(*SCREEN_DISPLAY_OPTIONS, id="display-options")
+                yield SelectionList(*SCREEN_GLOBAL_OPTIONS, id="global-options")
 
     def on_show(self):
         self.query_one(RadioSet).focus()

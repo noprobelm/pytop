@@ -33,6 +33,22 @@ Main Setup {
     height: 1fr;
 }
 
+Setup #categories {
+    height: 100%;
+    border: $accent panel;
+    border-title-color: $text;
+    border-title-style: bold;
+}
+
+Setup SelectionList {
+    border: $accent panel;
+    border-title-color: $text;
+    border-title-style: bold;
+
+    margin: 0 0 1 1;
+
+}
+
 Main .enabled {
     display: block;
     visibility: visible;
