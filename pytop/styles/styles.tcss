@@ -40,7 +40,30 @@ Setup #categories {
     border-title-style: bold;
 }
 
-Setup SelectionList {
+Setup DisplayOptions SelectionList {
+    border: $accent panel;
+    overflow-y: auto;
+    border-title-color: $text;
+    border-title-style: bold;
+
+}
+
+Setup MeterHeaderOptions SelectionList {
+    border: $accent panel;
+    overflow-y: auto;
+    border-title-color: $text;
+    border-title-style: bold;
+
+}
+
+Setup ProcessTableOptions SelectionList {
+    border: $accent panel;
+    overflow-y: auto;
+    border-title-color: $text;
+    border-title-style: bold;
+}
+
+Setup MeterLayoutOptions SelectionList {
     border: $accent panel;
     overflow-y: auto;
     border-title-color: $text;
