@@ -1,5 +1,6 @@
+from textual.app import ComposeResult
 from textual.widget import Widget
-from textual.widgets import RadioSet, RadioButton, SelectionList
+from textual.widgets import RadioSet, RadioButton, SelectionList, Static
 from textual.containers import Horizontal, Vertical
 
 SCREEN_DISPLAY_OPTIONS = (
@@ -43,7 +44,7 @@ SCREEN_GLOBAL_OPTIONS = (
     ),
 )
 
-HEADER_LAYOUT_OPTIONS = (
+METER_LAYOUT_OPTIONS = (
     ("2 columns - 50/50 (default)", 0),
     ("2 columns - 33/67", 1),
     ("2 columns - 67/33", 2),
@@ -59,24 +60,50 @@ HEADER_LAYOUT_OPTIONS = (
 )
 
 
+class DisplayOptions(Vertical):
+    def compose(self) -> ComposeResult:
+        yield SelectionList(*SCREEN_DISPLAY_OPTIONS, id="display-options")
+        yield SelectionList(*SCREEN_GLOBAL_OPTIONS, id="global-options")
+
+
+class MeterLayoutOptions(Vertical):
+    def compose(self) -> ComposeResult:
+        yield SelectionList(*METER_LAYOUT_OPTIONS, id="display-options")
+
+
+class Meters(Vertical):
+    def compose(self) -> ComposeResult:
+        pass
+
+
 class Setup(Widget):
+    SELECTION_MAPPER = {0: DisplayOptions, 1: MeterLayoutOptions}
+
     def on_mount(self):
         self.query_one("#categories", RadioSet).border_title = "Categories"
         self.query_one("#display-options").border_title = "Display Options"
         self.query_one("#global-options").border_title = "Global Options"
 
     def compose(self):
-        with Horizontal():
+        with Horizontal(id="options-layout"):
             with RadioSet(id="categories"):
-                yield RadioButton("Display options", value=True)
-                yield RadioButton("Header layout")
+                yield RadioButton(
+                    "Display options", value=True, id="display-options-radio-button"
+                )
+                yield RadioButton(
+                    "Header layout", value=True, id="header-layout-radio-button"
+                )
                 yield RadioButton("Meters")
                 yield RadioButton("Screens")
                 yield RadioButton("Colors")
 
-            with Vertical():
-                yield SelectionList(*SCREEN_DISPLAY_OPTIONS, id="display-options")
-                yield SelectionList(*SCREEN_GLOBAL_OPTIONS, id="global-options")
+            yield DisplayOptions(id="activated-options")
 
     def on_show(self):
         self.query_one(RadioSet).focus()
+
+    def on_radio_set_changed(self, event: RadioSet.Changed) -> None:
+        self.query_one("#activated-options").remove()
+        self.query_one("#options-layout").mount(
+            self.SELECTION_MAPPER[event.index](id="activated-options")
+        )
