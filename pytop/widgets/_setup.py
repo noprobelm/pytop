@@ -1,7 +1,7 @@
 from textual.app import ComposeResult
 from textual.widget import Widget
 from textual.widgets import RadioSet, RadioButton, SelectionList, Static
-from textual.containers import Horizontal, Vertical
+from textual.containers import Horizontal, Vertical, Container
 
 SCREEN_DISPLAY_OPTIONS = (
     ("Process Table - Tree View", 0),
@@ -61,28 +61,65 @@ METER_LAYOUT_OPTIONS = (
 
 
 class DisplayOptions(Vertical):
+    def on_mount(self):
+        self.query_one("#display-options").border_title = "Display Options"
+        self.query_one("#global-options").border_title = "Global Options"
+
     def compose(self) -> ComposeResult:
         yield SelectionList(*SCREEN_DISPLAY_OPTIONS, id="display-options")
         yield SelectionList(*SCREEN_GLOBAL_OPTIONS, id="global-options")
 
 
-class MeterLayoutOptions(Vertical):
+class MeterHeaderOptions(Container):
+    def on_mount(self) -> None:
+        self.query_one("#meter-layout-options").border_title = "Header Layout"
+
     def compose(self) -> ComposeResult:
-        yield SelectionList(*METER_LAYOUT_OPTIONS, id="display-options")
+        yield SelectionList(*METER_LAYOUT_OPTIONS, id="meter-layout-options")
 
 
-class Meters(Vertical):
+class MeterLayoutOptions(Horizontal):
+    def on_mount(self):
+        self.query_one("#col-1-meter-layout").border_title = "Column 1"
+        self.query_one("#col-2-meter-layout").border_title = "Column 2"
+        self.query_one("#meter-list").border_title = "Available Meters"
+
     def compose(self) -> ComposeResult:
-        pass
+        yield SelectionList(
+            ("1", 1), ("2", 2), ("3", 3), ("4", 4), id="col-1-meter-layout"
+        )
+        yield SelectionList(
+            ("1", 1), ("2", 2), ("3", 3), ("4", 4), id="col-2-meter-layout"
+        )
+        yield SelectionList(("okay jose", 1), id="meter-list")
+
+
+class ProcessTableOptions(Horizontal):
+    ACTIVE_SCREENS = (("Main", 0), ("IO", 0))
+    ACTIVE_COLUMNS = (("PID", 0), ("USER", 1))
+    AVAILABLE_COLUMNS = (("PID", 0), ("USER", 1))
+
+    def on_mount(self):
+        self.query_one("#screens-list").border_title = "Screens"
+        self.query_one("#active-columns-list").border_title = "Active Columns"
+        self.query_one("#available-columns-list").border_title = "Available Columns"
+
+    def compose(self):
+        yield SelectionList(*self.ACTIVE_SCREENS, id="screens-list")
+        yield SelectionList(*self.ACTIVE_COLUMNS, id="active-columns-list")
+        yield SelectionList(*self.AVAILABLE_COLUMNS, id="available-columns-list")
 
 
 class Setup(Widget):
-    SELECTION_MAPPER = {0: DisplayOptions, 1: MeterLayoutOptions}
+    SELECTION_MAPPER = {
+        0: DisplayOptions,
+        1: MeterHeaderOptions,
+        2: MeterLayoutOptions,
+        3: ProcessTableOptions,
+    }
 
     def on_mount(self):
         self.query_one("#categories", RadioSet).border_title = "Categories"
-        self.query_one("#display-options").border_title = "Display Options"
-        self.query_one("#global-options").border_title = "Global Options"
 
     def compose(self):
         with Horizontal(id="options-layout"):
@@ -95,7 +132,6 @@ class Setup(Widget):
                 )
                 yield RadioButton("Meters")
                 yield RadioButton("Screens")
-                yield RadioButton("Colors")
 
             yield DisplayOptions(id="activated-options")
 
