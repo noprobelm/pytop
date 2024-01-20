@@ -1,5 +1,5 @@
 from textual.widget import Widget
-from textual.widgets import RadioSet, RadioButton, SelectionList
+from textual.widgets import RadioSet, RadioButton
 from textual.containers import Horizontal
 from ._display_options import DisplayOptions
 from ._meter_header_options import MeterHeaderOptions

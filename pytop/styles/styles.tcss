@@ -29,8 +29,9 @@ Main #information-area {
 }
 
 
-Main Setup {
+Setup {
     height: 1fr;
+    width: auto;
 }
 
 Setup #options-master-list {
@@ -53,31 +54,39 @@ Setup MeterHeaderOptions RadioSet {
     overflow-y: auto;
     border-title-color: $text;
     border-title-style: bold;
-
+    height: 100%;
+    width: 100%;
 }
+
+
+
 
 Setup MeterLayoutOptions OptionList {
     border: $accent panel;
     overflow-y: auto;
     border-title-color: $text;
     border-title-style: bold;
-
+    width: 1fr;
+    height: 100%
 }
+
+
 
 Setup ProcessTableOptions SelectionList {
     border: $accent panel;
     overflow-y: auto;
     border-title-color: $text;
     border-title-style: bold;
+    height: 100%;
 }
 
 
-Main .enabled {
+.enabled {
     display: block;
     visibility: visible;
 }
 
-Main .disabled {
+.disabled {
     display: none;
     visibility: hidden;
 }
