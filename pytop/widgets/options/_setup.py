@@ -16,11 +16,11 @@ class Setup(Widget):
     }
 
     def on_mount(self):
-        self.query_one("#categories", RadioSet).border_title = "Categories"
+        self.query_one("#options-master-list", RadioSet).border_title = "Categories"
 
     def compose(self):
         with Horizontal(id="options-layout"):
-            with RadioSet(id="categories"):
+            with RadioSet(id="options-master-list"):
                 yield RadioButton(
                     "Display options", value=True, id="display-options-radio-button"
                 )
