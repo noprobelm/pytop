@@ -1,4 +1,4 @@
-MeterHeader {
+Meters {
     height: auto;
     margin: 1;
 }
@@ -7,11 +7,11 @@ MeterHeader {
     height: auto;
 }
 
-MeterHeader .meter-row {
+Meters .meter-row {
     height: 1;
 }
 
-MeterHeader .meter {
+Meters .meter {
     width: 1fr;
 }
 

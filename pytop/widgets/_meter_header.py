@@ -3,7 +3,7 @@ import psutil
 from ..widgets import *
 
 
-class MeterHeader(Horizontal):
+class Meters(Horizontal):
     def compose(self):
         num_cores = psutil.cpu_count()
 

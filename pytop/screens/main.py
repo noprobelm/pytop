@@ -5,7 +5,7 @@ from textual.binding import Binding
 from textual.screen import Screen
 from textual.widgets import Footer
 from textual.containers import Container
-from ..widgets import CPUUsage, ProcessTable, Tasks, MeterHeader, Setup
+from ..widgets import CPUUsage, ProcessTable, Tasks, Meters, Setup
 from ..widgets._process_table import Process
 from ..widgets._tasks import TaskMetrics
 import psutil
@@ -36,7 +36,7 @@ class Main(Screen):
             super().__init__()
 
     def compose(self) -> ComposeResult:
-        yield MeterHeader()
+        yield Meters()
         with Container(id="information-area"):
             yield ProcessTable(classes="enabled")
             yield Setup(classes="disabled")
