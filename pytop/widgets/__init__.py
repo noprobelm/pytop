@@ -7,3 +7,4 @@ from ._swap_usage import SwapUsage
 from ._uptime import Uptime
 from ._meter_header import Meters
 from .options import Setup
+from textual.containers import Horizontal, Container

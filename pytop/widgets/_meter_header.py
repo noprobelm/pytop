@@ -1,6 +1,7 @@
 from textual.containers import Vertical, Horizontal
 import psutil
 from ..widgets import *
+from collections import namedtuple
 
 
 class Meters(Horizontal):

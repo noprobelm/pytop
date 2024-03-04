@@ -4,7 +4,6 @@ from ..widgets import *
 from textual.widget import Widget
 from textual.widgets import Static, Label
 
-
 class MeterColumn(Vertical):
     DEFAULT_CSS = """
     MeterColumn {
